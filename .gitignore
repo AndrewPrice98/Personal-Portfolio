@@ -1,7 +1,7 @@
-node_modules/
-.env
+.DS_Store
+Thumbs.db
 
-# Google API secrets: never commit these
+# Old Google API secrets from the server version: never commit these
 credentials.json
 token.json
 *-service-account*.json

@@ -1,16 +1,15 @@
 services:
   - type: web
     name: andrew-portfolio
-    runtime: node
-    plan: free
-    buildCommand: npm ci
-    startCommand: npm start
+    runtime: static
+    buildCommand: echo "No build step"
+    staticPublishPath: ./public
     autoDeploy: true
-    envVars:
-      - key: NODE_ENV
-        value: production
-      # Set these two in the Render dashboard (they are secrets, so not stored here).
-      - key: SHEET_ID
-        sync: false
-      - key: GOOGLE_CREDENTIALS
-        sync: false
+    routes:
+      # Keep the old page addresses working.
+      - type: redirect
+        source: /portfolio
+        destination: /portfolio.html
+      - type: redirect
+        source: /contact
+        destination: /contact.html

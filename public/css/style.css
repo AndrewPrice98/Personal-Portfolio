@@ -15,9 +15,6 @@
     --green: #39ff88;
     --yellow: #ffe066;
     --error: #ff5370;
-    --error-soft: rgba(255, 83, 112, 0.12);
-    --success: #39ff88;
-    --success-soft: rgba(57, 255, 136, 0.1);
     --mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
     --radius: 8px;
 }
@@ -194,69 +191,10 @@ h3 { font-size: 1.15rem; margin: 0 0 0.5rem; color: var(--yellow); }
 }
 .card-links { display: flex; gap: 0.5rem; }
 
-/* Form */
-.form {
-    padding: 2rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-}
-.field { margin-bottom: 1.25rem; }
-label {
-    display: block;
-    font-family: var(--mono);
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--purple);
-    margin-bottom: 0.35rem;
-}
-input {
-    width: 100%;
-    padding: 0.7rem 0.85rem;
-    font: inherit;
-    font-family: var(--mono);
-    font-size: 0.95rem;
-    color: var(--text);
-    caret-color: var(--accent);
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-}
-input::placeholder { color: #4b5568; }
-input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 1px var(--accent), 0 0 14px rgba(0, 229, 255, 0.3);
-}
-input[aria-invalid="true"] { border-color: var(--error); }
-.error { color: var(--error); font-size: 0.9rem; margin: 0.35rem 0 0; }
-.alert {
-    padding: 0.85rem 1rem;
-    margin: 0 0 1.25rem;
-    border-radius: 8px;
-    background: var(--error-soft);
-    color: var(--error);
-}
-
-/* Thanks / 404 */
+/* Contact / 404 */
 .thanks { padding: 5rem 0; text-align: center; }
 .thanks .lead { margin: 0 auto; }
 .thanks .hero-actions { justify-content: center; }
-.check {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 1.5rem;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    background: var(--success-soft);
-    border: 1px solid var(--success);
-    color: var(--success);
-    font-size: 2rem;
-    font-weight: 700;
-    box-shadow: 0 0 24px rgba(57, 255, 136, 0.35);
-    text-shadow: 0 0 10px rgba(57, 255, 136, 0.8);
-}
 
 /* Typing heading */
 .typed { min-height: 1.15em; }
