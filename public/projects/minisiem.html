@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MiniSIEM case file | Andrew T. Price II</title>
+    <meta name="description" content="MiniSIEM: a lightweight SIEM that ingests Linux auth and web access logs, runs Sigma-style rules mapped to MITRE ATT&amp;CK, and shows alerts in a React dashboard. Live read-only demo.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b0e14'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='20' font-weight='700' text-anchor='middle' fill='%235fb8c7'%3E~/%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container nav">
+            <a class="brand" href="../index.html"><span>Andrew T. Price II</span></a>
+            <nav aria-label="Main">
+                <a href="../index.html">Home</a>
+                <a href="../portfolio.html" aria-current="true">Projects</a>
+                <a href="../resume.html">Resume</a>
+                <a href="../contact.html">Contact</a>
+            </nav>
+        </div>
+    </header>
+    <aside class="fast-lane" aria-label="At a glance">
+        <div class="container fast-lane-inner">
+            <p class="fast-lane-facts">Active DoD Secret clearance &middot; CompTIA Security+ (IAT II) &middot; 5+ yrs USAF avionics &middot; Full-stack developer</p>
+            <div class="fast-lane-actions">
+                <span class="badge-open">open to work</span>
+                <a class="fl-resume" href="../resume.html">Resume</a>
+                <a class="fl-linkedin" href="https://www.linkedin.com/in/andrew-price98" target="_blank" rel="noopener">LinkedIn <span class="visually-hidden">(opens in a new tab)</span></a>
+                <a class="fl-contact" href="../contact.html">Contact</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="container">
+        <article class="case-file">
+            <p class="case-back"><a href="../portfolio.html">&larr; All projects</a></p>
+            <h1>MiniSIEM</h1>
+            <p class="case-meta"><span class="sev sev-crit" data-severity="crit" title="Featured: flagship">CRIT</span> <span class="sev-note">Featured: flagship</span> <span>Log analysis, detection engineering, full stack</span> <span>Python, FastAPI, SQLite, React, Vite, MITRE ATT&amp;CK</span></p>
+            <section class="case-section">
+<h2>Summary</h2>
+<p>MiniSIEM is a lightweight Security Information and Event Management tool. It ingests Linux auth logs and web server access logs, normalizes them into one event schema, runs Sigma-style detection rules mapped to MITRE ATT&amp;CK, and shows the alerts in a React dashboard with every triggering raw log line one click away. A <a href="https://minisiem.vercel.app/" target="_blank" rel="noopener">live demo<span class="visually-hidden"> (opens in a new tab)</span></a> opens without a password and replays a full intrusion every hour, so there are always fresh alerts to investigate.</p>
+            </section>
+            <section class="case-section">
+<h2>Problem</h2>
+<p>An analyst's day starts in a SIEM, but the real ones are heavy to run and hide how detection actually works. I wanted to build the core loop myself, end to end: collect logs, parse them reliably, write rules that catch a real attack chain without drowning in noise, and give an analyst a view that goes from an alert straight to the evidence.</p>
+<p>It also had to be something a reviewer can open in a browser and use in seconds, without installing anything or being handed a password, and without that public access becoming the weak spot.</p>
+            </section>
+            <section class="case-section">
+<h2>What I built</h2>
+<ul>
+<li><strong>Collection and parsing.</strong> Parsers for sshd, sudo, PAM, useradd, usermod and gpasswd (classic and RFC 3339 syslog), and for Combined and Common Log Format web logs. Timestamps are normalized to UTC, the original line is always kept, and unparseable lines are counted and sampled, never silently dropped. Re-ingesting a file adds nothing.</li>
+<li><strong>Detection engineering.</strong> Eight rules written as YAML data, each mapped to an ATT&amp;CK technique: SSH brute force, login success after repeated failures, suspicious sudo commands, new local accounts, privileged group changes, logins from a new IP, web directory enumeration and web attack payloads.</li>
+<li><strong>A rule engine.</strong> Four rule types (match, threshold, sequence and first-seen) with field modifiers such as <code>|contains</code> and <code>|re</code>. Alerts are fingerprinted and upserted, so re-running detection never duplicates them.</li>
+<li><strong>An analyst dashboard.</strong> React 18 and Vite: an overview with events over time and top sources, a filterable alert queue, an alert page with its rule, ATT&amp;CK context and raw log lines, event search, and an ATT&amp;CK coverage heatmap. The charts are hand-drawn SVG.</li>
+<li><strong>A safe public demo.</strong> Anonymous visitors are read-only guests, and write endpoints return 403. The sample intrusion replays live on host <code>demo-live</code>, so new alerts arrive every hour.</li>
+<li><strong>Hardening.</strong> PBKDF2 password hashes, an httpOnly SameSite=Strict JWT cookie, per-IP login lockout, a fail-closed API, parameterized SQL with allow-listed sort columns, upload validation, and a strict Content-Security-Policy.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>How it works</h2>
+<ol>
+<li><strong>Normalize first.</strong> Every source decodes to one ECS-style event (action, outcome, user, source IP, host) stored in SQLite with indexes on time, IP, user and host. Rules only ever see that schema.</li>
+<li><strong>Rules are data.</strong> Thresholds, windows and patterns live in YAML, so tuning a rule never means touching Python. A test checks that the sample dataset fires every rule.</li>
+<li><strong>Alerts link to evidence.</strong> Each alert stores the events that triggered it, so the alert page shows the exact raw lines behind the decision.</li>
+<li><strong>A demo that stays current.</strong> On Vercel each serverless instance builds its own throwaway database from the example logs, shifted to end at the present. The attack segment of the sample day (web scan, injection attempts, two brute forces, the login, sudo abuse and a backdoor account) is replayed every hour, and each request catches up on lines whose replay time has passed.</li>
+</ol>
+<figure class="case-figure">
+<img src="../images/cases/minisiem-alert-detail.webp" alt="MiniSIEM alert page for a critical alert: deploy logged in from 198.51.100.23 after 7 failed attempts, with the ATT&amp;CK technique T1078, the rule logic and the eight triggering sshd log lines" width="1200" height="549" loading="lazy">
+<figcaption>A critical alert, the brute force that worked: the rule's logic, its ATT&amp;CK mapping and the eight raw sshd lines that triggered it.</figcaption>
+</figure>
+            </section>
+            <section class="case-section">
+<h2>Evidence</h2>
+<p>The bundled sample is a deterministic day of logs with an intrusion in the middle of normal traffic, and every rule fires on it:</p>
+<pre><code>Time   Actor           Activity                                      Rule(s)
+02:40  192.0.2.77      wordlist scan of web01                        007
+02:47  192.0.2.77      SQLi, path traversal, XSS, command injection  008 x5
+03:12  203.0.113.45    SSH brute force, fails                        001
+03:20  198.51.100.23   guesses deploy's password and logs in         001, 002, 006
+03:22  deploy          sudo cat /etc/shadow, sudo /bin/bash          003 x2
+03:24  deploy          creates svc-backup, adds it to sudo           004, 005</code></pre>
+<p>Beyond that day, 29 single-scenario logs cover benign baselines, each attack on its own, format edge cases and evasions the rules deliberately miss. 285 tests cover every parser, every rule (should fire and should not fire), every example log against its manifest, every API endpoint, SQL injection payloads on every parameter, upload validation, guest mode, the replay and authentication. CI runs the tests, rule validation, the frontend build, <code>pip-audit</code>, <code>npm audit</code> and a gitleaks secret scan on every push to main and every pull request.</p>
+<figure class="case-figure">
+<img src="../images/cases/minisiem-overview.webp" alt="MiniSIEM overview dashboard: event and alert totals, alerts by severity, events over time, top source IPs and top targeted users" width="1200" height="823" loading="lazy">
+<figcaption>The overview: totals by severity, events and failed logins over time, and the noisiest sources and most targeted accounts.</figcaption>
+</figure>
+<figure class="case-figure">
+<img src="../images/cases/minisiem-attack.webp" alt="MiniSIEM ATT&amp;CK coverage page: a heatmap of techniques by tactic and a table of the eight detection rules with severity, source and technique" width="1200" height="651" loading="lazy">
+<figcaption>ATT&amp;CK coverage: which techniques have a rule and how often each has fired, above the rule catalog.</figcaption>
+</figure>
+            </section>
+            <section class="case-section">
+<h2>What I'd do next</h2>
+<ul>
+<li><strong>Alert triage.</strong> Status, assignee and notes on each alert, so the queue becomes a workflow rather than a list.</li>
+<li><strong>Real-time collection.</strong> Ingestion is batch-only today (CLI or upload). Syslog or folder watching is next.</li>
+<li><strong>Cross-source correlation.</strong> Tie the web attack and the SSH intrusion together as one incident instead of separate alerts.</li>
+<li><strong>Scale honestly.</strong> Detection re-scans all stored events each run, which is fine for a demo but not production; incremental processing and a shared rate-limit store would come first.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>Links</h2>
+<ul class="case-links">
+<li><a class="btn btn-small" href="https://minisiem.vercel.app/" target="_blank" rel="noopener">Live demo</a></li>
+<li><a class="btn btn-small btn-ghost" href="https://github.com/AndrewPrice98/MiniSIEM" target="_blank" rel="noopener">Code on GitHub</a></li>
+<li><a class="btn btn-small btn-ghost" href="https://github.com/AndrewPrice98/MiniSIEM/blob/main/DECISIONS.md" target="_blank" rel="noopener">Design decisions</a></li>
+<li><a class="btn btn-small btn-ghost" href="../portfolio.html">Back to all projects</a></li>
+</ul>
+            </section>
+        </article>
+    </main>
+
+    <footer class="site-footer status-bar">
+        <div class="status-left">
+            <span class="status-branch">&#x2387; main</span>
+            <span class="status-ok">&#x2713; 0 errors</span>
+            <span>&copy; 2026 Andrew T. Price II</span>
+        </div>
+        <div class="status-right">
+            <span class="status-extra">UTF-8</span>
+            <span class="status-extra">HTML</span>
+            <a href="https://github.com/AndrewPrice98" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+
+</body>
+</html>

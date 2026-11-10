@@ -67,6 +67,7 @@ security analyst · full-stack developer · avionics technician</pre>
                 <li><span class="when"><time datetime="2026-08">August 2026</time>&ndash;present</span> <span class="what">Full Stack Development Apprentice, Creating Coding Careers (U.S. Department of Labor registered apprenticeship).</span></li>
                 <li><span class="when"><time datetime="2026">2026</time></span> <span class="what">Built:
                     <a href="projects/netguard.html">NetGuard</a>,
+                    <a href="projects/minisiem.html">MiniSIEM</a>,
                     <a href="projects/logingestllm.html">LogIngestLLM</a>,
                     <a href="projects/ccna-study.html">CCNA Study</a>,
                     <a href="projects/cysa-study.html">CySA+ Study</a>.</span></li>
@@ -79,77 +80,84 @@ security analyst · full-stack developer · avionics technician</pre>
         <section class="net-map" id="map" aria-labelledby="map-title">
             <h2 id="map-title">Network map</h2>
             <p class="net-map-intro">R1 is me. Each switch is a skill area, and each device on it is something I have built or earned.</p>
-            <svg viewBox="-6 0 1052 350" role="group" aria-labelledby="map-svg-desc">
-                <desc id="map-svg-desc">Network map: R1 Andrew connects to three switches, SW-SECURITY, SW-WEB and SW-USAF, with nine linked devices (projects and credentials).</desc>
+            <svg viewBox="-6 0 1146 350" role="group" aria-labelledby="map-svg-desc">
+                <desc id="map-svg-desc">Network map: R1 Andrew connects to three switches, SW-SECURITY, SW-WEB and SW-USAF, with ten linked devices (projects and credentials).</desc>
                 <g class="links">
-                    <path d="M520 62 V110 M220 110 H925 M220 110 V150 M625 110 V150 M925 110 V150"/>
-                    <path d="M220 190 V220 M55 220 H385 M55 220 V240 M165 220 V240 M275 220 V240 M385 220 V240"/>
-                    <path d="M625 190 V220 M515 220 H735 M515 220 V240 M625 220 V240 M735 220 V240"/>
-                    <path d="M925 190 V220 M865 220 H985 M865 220 V240 M985 220 V240"/>
+                    <path d="M567 62 V110 M275 110 H1030 M275 110 V150 M735 110 V150 M1030 110 V150"/>
+                    <path d="M275 190 V220 M55 220 H495 M55 220 V240 M165 220 V240 M275 220 V240 M385 220 V240 M495 220 V240"/>
+                    <path d="M735 190 V220 M625 220 H845 M625 220 V240 M735 220 V240 M845 220 V240"/>
+                    <path d="M1030 190 V220 M975 220 H1085 M975 220 V240 M1085 220 V240"/>
                 </g>
-                <g class="node router"><rect x="440" y="14" width="160" height="48" rx="8"/><text x="520" y="35" text-anchor="middle">R1</text><text x="520" y="52" text-anchor="middle">Andrew</text></g>
-                <g class="node switch"><rect x="150" y="150" width="140" height="40" rx="6"/><text x="220" y="175" text-anchor="middle">SW-SECURITY</text></g>
-                <g class="node switch"><rect x="555" y="150" width="140" height="40" rx="6"/><text x="625" y="175" text-anchor="middle">SW-WEB</text></g>
-                <g class="node switch"><rect x="855" y="150" width="140" height="40" rx="6"/><text x="925" y="175" text-anchor="middle">SW-USAF</text></g>
+                <g class="node router"><rect x="487" y="14" width="160" height="48" rx="8"/><text x="567" y="35" text-anchor="middle">R1</text><text x="567" y="52" text-anchor="middle">Andrew</text></g>
+                <g class="node switch"><rect x="205" y="150" width="140" height="40" rx="6"/><text x="275" y="175" text-anchor="middle">SW-SECURITY</text></g>
+                <g class="node switch"><rect x="665" y="150" width="140" height="40" rx="6"/><text x="735" y="175" text-anchor="middle">SW-WEB</text></g>
+                <g class="node switch"><rect x="960" y="150" width="140" height="40" rx="6"/><text x="1030" y="175" text-anchor="middle">SW-USAF</text></g>
                 <a class="device proj" href="projects/netguard.html" aria-label="NetGuard">
                     <rect class="ring" x="1" y="238" width="108" height="64" rx="8"/>
                     <rect class="box" x="3" y="240" width="104" height="60" rx="6"/>
                     <text text-anchor="middle"><tspan x="55" y="272">NetGuard</tspan></text>
                     <text class="tip" x="3" y="332" text-anchor="start" aria-hidden="true">NetGuard: IDS and SOC console in Python - case file</text>
                 </a>
-                <a class="device proj" href="projects/logingestllm.html" aria-label="LogIngestLLM">
+                <a class="device proj" href="projects/minisiem.html" aria-label="MiniSIEM">
                     <rect class="ring" x="111" y="238" width="108" height="64" rx="8"/>
                     <rect class="box" x="113" y="240" width="104" height="60" rx="6"/>
-                    <text text-anchor="middle"><tspan x="165" y="272">LogIngestLLM</tspan></text>
+                    <text text-anchor="middle"><tspan x="165" y="272">MiniSIEM</tspan></text>
+                    <text class="tip" x="3" y="332" text-anchor="start" aria-hidden="true">MiniSIEM: log SIEM with a live demo - case file</text>
+                </a>
+                <a class="device proj" href="projects/logingestllm.html" aria-label="LogIngestLLM">
+                    <rect class="ring" x="221" y="238" width="108" height="64" rx="8"/>
+                    <rect class="box" x="223" y="240" width="104" height="60" rx="6"/>
+                    <text text-anchor="middle"><tspan x="275" y="272">LogIngestLLM</tspan></text>
                     <text class="tip" x="3" y="332" text-anchor="start" aria-hidden="true">LogIngestLLM: local-only log analyzer - case file</text>
                 </a>
                 <a class="device proj" href="projects/cysa-study.html" aria-label="CySA+ Study">
-                    <rect class="ring" x="221" y="238" width="108" height="64" rx="8"/>
-                    <rect class="box" x="223" y="240" width="104" height="60" rx="6"/>
-                    <text text-anchor="middle"><tspan x="275" y="272">CySA+ Study</tspan></text>
-                    <text class="tip" x="275" y="332" text-anchor="middle" aria-hidden="true">CySA+ Study: exam trainer with 16 labs - case file</text>
-                </a>
-                <a class="device cred" href="resume.html#highlights" aria-label="Security+">
                     <rect class="ring" x="331" y="238" width="108" height="64" rx="8"/>
                     <rect class="box" x="333" y="240" width="104" height="60" rx="6"/>
-                    <text text-anchor="middle"><tspan x="385" y="272">Security+</tspan></text>
-                    <text class="tip" x="385" y="332" text-anchor="middle" aria-hidden="true">CompTIA Security+ - resume highlights</text>
+                    <text text-anchor="middle"><tspan x="385" y="272">CySA+ Study</tspan></text>
+                    <text class="tip" x="385" y="332" text-anchor="middle" aria-hidden="true">CySA+ Study: exam trainer with 16 labs - case file</text>
+                </a>
+                <a class="device cred" href="resume.html#highlights" aria-label="Security+">
+                    <rect class="ring" x="441" y="238" width="108" height="64" rx="8"/>
+                    <rect class="box" x="443" y="240" width="104" height="60" rx="6"/>
+                    <text text-anchor="middle"><tspan x="495" y="272">Security+</tspan></text>
+                    <text class="tip" x="495" y="332" text-anchor="middle" aria-hidden="true">CompTIA Security+ - resume highlights</text>
                 </a>
                 <a class="device proj" href="projects/ccna-study.html" aria-label="CCNA Study">
-                    <rect class="ring" x="461" y="238" width="108" height="64" rx="8"/>
-                    <rect class="box" x="463" y="240" width="104" height="60" rx="6"/>
-                    <text text-anchor="middle"><tspan x="515" y="272">CCNA Study</tspan></text>
-                    <text class="tip" x="515" y="332" text-anchor="middle" aria-hidden="true">CCNA Study: Cisco IOS simulator in JavaScript - case file</text>
-                </a>
-                <a class="device proj" href="projects/job-tracker.html" aria-label="Job Tracker">
                     <rect class="ring" x="571" y="238" width="108" height="64" rx="8"/>
                     <rect class="box" x="573" y="240" width="104" height="60" rx="6"/>
-                    <text text-anchor="middle"><tspan x="625" y="272">Job Tracker</tspan></text>
-                    <text class="tip" x="625" y="332" text-anchor="middle" aria-hidden="true">Job Tracker: inbox-reading job search organizer - case file</text>
+                    <text text-anchor="middle"><tspan x="625" y="272">CCNA Study</tspan></text>
+                    <text class="tip" x="625" y="332" text-anchor="middle" aria-hidden="true">CCNA Study: Cisco IOS simulator in JavaScript - case file</text>
                 </a>
-                <a class="device proj" href="projects/flight-tracker.html" aria-label="Flight Tracker">
+                <a class="device proj" href="projects/job-tracker.html" aria-label="Job Tracker">
                     <rect class="ring" x="681" y="238" width="108" height="64" rx="8"/>
                     <rect class="box" x="683" y="240" width="104" height="60" rx="6"/>
-                    <text text-anchor="middle"><tspan x="735" y="264">Flight</tspan><tspan x="735" y="280">Tracker</tspan></text>
-                    <text class="tip" x="735" y="332" text-anchor="middle" aria-hidden="true">Flight Tracker: live military aircraft map - case file</text>
+                    <text text-anchor="middle"><tspan x="735" y="272">Job Tracker</tspan></text>
+                    <text class="tip" x="735" y="332" text-anchor="middle" aria-hidden="true">Job Tracker: inbox-reading job search organizer - case file</text>
+                </a>
+                <a class="device proj" href="projects/flight-tracker.html" aria-label="Flight Tracker">
+                    <rect class="ring" x="791" y="238" width="108" height="64" rx="8"/>
+                    <rect class="box" x="793" y="240" width="104" height="60" rx="6"/>
+                    <text text-anchor="middle"><tspan x="845" y="264">Flight</tspan><tspan x="845" y="280">Tracker</tspan></text>
+                    <text class="tip" x="845" y="332" text-anchor="middle" aria-hidden="true">Flight Tracker: live military aircraft map - case file</text>
                 </a>
                 <a class="device cred" href="resume.html" aria-label="AC-130 / C-130 avionics">
-                    <rect class="ring" x="811" y="238" width="108" height="64" rx="8"/>
-                    <rect class="box" x="813" y="240" width="104" height="60" rx="6"/>
-                    <text text-anchor="middle"><tspan x="865" y="256">AC-130 /</tspan><tspan x="865" y="272">C-130</tspan><tspan x="865" y="288">avionics</tspan></text>
-                    <text class="tip" x="1037" y="332" text-anchor="end" aria-hidden="true">AC-130 / C-130 avionics, U.S. Air Force - resume</text>
+                    <rect class="ring" x="921" y="238" width="108" height="64" rx="8"/>
+                    <rect class="box" x="923" y="240" width="104" height="60" rx="6"/>
+                    <text text-anchor="middle"><tspan x="975" y="256">AC-130 /</tspan><tspan x="975" y="272">C-130</tspan><tspan x="975" y="288">avionics</tspan></text>
+                    <text class="tip" x="1137" y="332" text-anchor="end" aria-hidden="true">AC-130 / C-130 avionics, U.S. Air Force - resume</text>
                 </a>
                 <a class="device cred" href="resume.html#highlights" aria-label="Secret clearance">
-                    <rect class="ring" x="931" y="238" width="108" height="64" rx="8"/>
-                    <rect class="box" x="933" y="240" width="104" height="60" rx="6"/>
-                    <text text-anchor="middle"><tspan x="985" y="264">Secret</tspan><tspan x="985" y="280">clearance</tspan></text>
-                    <text class="tip" x="1037" y="332" text-anchor="end" aria-hidden="true">Active DoD Secret clearance - resume highlights</text>
+                    <rect class="ring" x="1031" y="238" width="108" height="64" rx="8"/>
+                    <rect class="box" x="1033" y="240" width="104" height="60" rx="6"/>
+                    <text text-anchor="middle"><tspan x="1085" y="264">Secret</tspan><tspan x="1085" y="280">clearance</tspan></text>
+                    <text class="tip" x="1137" y="332" text-anchor="end" aria-hidden="true">Active DoD Secret clearance - resume highlights</text>
                 </a>
             </svg>
             <ul class="net-map-list">
                 <li><span class="sw-name">SW-SECURITY</span>
                     <ul>
                         <li><a href="projects/netguard.html">NetGuard</a></li>
+                        <li><a href="projects/minisiem.html">MiniSIEM</a></li>
                         <li><a href="projects/logingestllm.html">LogIngestLLM</a></li>
                         <li><a href="projects/cysa-study.html">CySA+ Study</a></li>
                         <li><a href="resume.html#highlights">Security+</a></li>
@@ -183,6 +191,12 @@ security analyst · full-stack developer · avionics technician</pre>
                         <span class="row-title" id="rt-netguard">NetGuard</span>
                         <span class="row-sum" id="rs-netguard">Network intrusion detection system and SOC console in standard-library Python. Its live-traffic detections are proven by attack simulations replayed in CI; the rest are unit-tested.</span>
                         <span class="row-tags"><span>Python</span><span>IDS</span><span>MITRE ATT&amp;CK</span></span>
+                    </a></li>
+                    <li class="alert-row" data-severity="crit" data-category="security"><a href="projects/minisiem.html" aria-labelledby="rt-minisiem" aria-describedby="rs-minisiem">
+                        <span class="row-head"><span class="sev sev-crit">CRIT</span> <span class="row-cat">security</span></span>
+                        <span class="row-title" id="rt-minisiem">MiniSIEM</span>
+                        <span class="row-sum" id="rs-minisiem">Lightweight SIEM that parses Linux auth and web logs and runs Sigma-style rules mapped to MITRE ATT&amp;CK. Its live demo opens without a password and replays an intrusion every hour.</span>
+                        <span class="row-tags"><span>Python</span><span>React</span><span>Live demo</span></span>
                     </a></li>
                     <li class="alert-row" data-severity="high" data-category="security"><a href="projects/logingestllm.html" aria-labelledby="rt-logingestllm" aria-describedby="rs-logingestllm">
                         <span class="row-head"><span class="sev sev-high">HIGH</span> <span class="row-cat">security</span></span>

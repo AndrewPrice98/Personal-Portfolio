@@ -214,7 +214,7 @@ def check_titles(site):
             if not (t := text_walk(html).title.strip()).endswith(TITLE_SUFFIX)]
 
 
-CASE_SLUGS = ["netguard", "logingestllm", "ccna-study", "cysa-study",
+CASE_SLUGS = ["netguard", "minisiem", "logingestllm", "ccna-study", "cysa-study",
               "job-tracker", "flight-tracker", "tempered", "sudo-snake"]
 CASE_SECTIONS = ["Summary", "Problem", "What I built", "How it works",
                  "Evidence", "What I'd do next", "Links"]
@@ -271,7 +271,7 @@ def check_case_files(site):
     return problems
 
 
-SEVERITY = {"netguard": "CRIT", "logingestllm": "HIGH", "ccna-study": "HIGH",
+SEVERITY = {"netguard": "CRIT", "minisiem": "CRIT", "logingestllm": "HIGH", "ccna-study": "HIGH",
             "cysa-study": "HIGH", "job-tracker": "MED", "flight-tracker": "MED",
             "tempered": "MED", "sudo-snake": "MED"}
 
@@ -501,7 +501,8 @@ def check_map(site):
     return problems
 
 
-QUEUE_FEATURED = {"NetGuard": "projects/netguard.html", "LogIngestLLM": "projects/logingestllm.html",
+QUEUE_FEATURED = {"NetGuard": "projects/netguard.html", "MiniSIEM": "projects/minisiem.html",
+                  "LogIngestLLM": "projects/logingestllm.html",
                   "CySA+ Study": "projects/cysa-study.html", "CCNA Study": "projects/ccna-study.html",
                   "Job Tracker": "projects/job-tracker.html",
                   "Military Flight Tracker": "projects/flight-tracker.html",

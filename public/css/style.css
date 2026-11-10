@@ -517,7 +517,7 @@ a:focus-visible, .btn:focus-visible {
 .net-map .device:hover .box { fill: var(--surface-2); }
 .net-map .device:focus-visible { outline: none; }
 .net-map .device:focus-visible .ring { display: block; }
-@media (min-width: 960px) {
+@media (min-width: 1040px) {
     .net-map svg { display: block; }
     .net-map-list { display: none; }
 }

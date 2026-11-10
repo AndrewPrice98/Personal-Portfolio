@@ -20,6 +20,7 @@
 
     var PROJECTS = [
         ['netguard', 'network intrusion detection and SOC console for small networks (Python)'],
+        ['minisiem', 'SIEM: log parsing, ATT&CK-mapped rules, live read-only demo'],
         ['logingestllm', 'local AI agent that summarizes logs and flags security events'],
         ['ccna-study', 'CCNA 200-301 study platform with a Cisco IOS simulator'],
         ['cysa-study', 'CySA+ (CS0-004) trainer with a pure-JavaScript Linux shell'],
