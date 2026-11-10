@@ -352,9 +352,11 @@ a:focus-visible, .btn:focus-visible {
     text-transform: uppercase;
     letter-spacing: 0.04em;
 }
-.sev-high { color: var(--error); }
-.sev-medium { color: var(--yellow); }
-.sev-low { color: var(--green); }
+.sev-crit { color: var(--error); background: rgba(217, 114, 124, 0.12); }
+.sev-high { color: var(--pink); }
+.sev-med { color: var(--yellow); }
+.sev-info { color: var(--accent); }
+.sev-note { font-size: 0.8rem; }
 .case-section { margin: 0 0 2.25rem; }
 .case-section h2 { margin-bottom: 0.75rem; overflow-wrap: anywhere; }
 .case-section p, .case-section li { max-width: 68ch; }

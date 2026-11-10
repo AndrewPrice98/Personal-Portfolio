@@ -38,7 +38,7 @@
         <article class="case-file">
             <p class="case-back"><a href="../portfolio.html">&larr; All projects</a></p>
             <h1>LogIngestLLM</h1>
-            <p class="case-meta"><span class="sev sev-high">Priority: High</span> <span>Security operations, local AI</span> <span>Python, Qwen3-4B (QLoRA), llama.cpp, Sigma</span></p>
+            <p class="case-meta"><span class="sev sev-high" data-severity="high" title="Featured: strong">HIGH</span> <span class="sev-note">Featured: strong</span> <span>Security operations, local AI</span> <span>Python, Qwen3-4B (QLoRA), llama.cpp, Sigma</span></p>
             <section class="case-section">
 <h2>Summary</h2>
 <p>LogIngestLLM is a local-only log analyzer and analyst co-pilot that runs on a model you fine-tune yourself. It reads Windows Event Logs (including exported <code>.evtx</code>, on any OS), Windows Prefetch, Linux journald and syslog, web server logs and application logs, and picks out the handful of events worth attention. It explains them for people learning to read logs, and gives SOC analysts ATT&amp;CK mapping, indicators, tool detection, a timeline and a cited incident report. Every claim links back to the exact line in the original log, and nothing leaves the machine.</p>
@@ -80,7 +80,6 @@
 <tr><td>v2: rebalanced Linux, Windows and web data, tool-aware labels</td><td>91.6%</td><td>98.3%</td><td>100%</td><td>100%</td></tr>
 </tbody></table></div>
 <p>End to end through the built-in engine (Q4_K_M plus LoRA in llama.cpp, deterministic), the known-answer evaluation passes 95 of 96 checks across five investigations: a Windows intrusion, a Linux break-in, a scanned web server, a failing device and a healthy laptop. The one miss is a training-data gap (privileged-group changes) that is already added for the next retrain. Anyone can reproduce it with <code>python -m logagent eval --model</code>.</p>
-<p class="case-note">My homepage card quotes an earlier measurement, 33% to 87% importance accuracy. The table above is the current README: the base model's 34.5% exact level against 91.6% for v2.</p>
             </section>
             <section class="case-section">
 <h2>What I'd do next</h2>

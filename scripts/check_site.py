@@ -235,8 +235,59 @@ def check_case_files(site):
     return problems
 
 
+SEVERITY = {"netguard": "CRIT", "logingestllm": "HIGH", "ccna-study": "HIGH",
+            "cysa-study": "HIGH", "job-tracker": "MED", "flight-tracker": "MED",
+            "tempered": "MED", "sudo-snake": "MED"}
+
+
+class SevWalker(HTMLParser):
+    """Collects the text of every element carrying a data-severity attribute."""
+
+    def __init__(self):
+        super().__init__()
+        self.tags, self._cur, self._depth = [], None, 0
+
+    def handle_starttag(self, tag, attrs):
+        if self._cur is not None and tag not in VOID:
+            self._depth += 1
+        elif "data-severity" in dict(attrs):
+            self._cur, self._depth = {"attr": dict(attrs)["data-severity"], "text": ""}, 1
+
+    def handle_endtag(self, tag):
+        if self._cur is not None and tag not in VOID:
+            self._depth -= 1
+            if self._depth == 0:
+                self.tags.append(self._cur)
+                self._cur = None
+
+    def handle_data(self, data):
+        if self._cur is not None:
+            self._cur["text"] += data
+
+
+def check_severity(site):
+    problems = []
+    for slug, want in SEVERITY.items():
+        name = f"projects/{slug}.html"
+        if name not in site.pages:
+            continue
+        w = SevWalker()
+        w.feed(site.pages[name])
+        w.close()
+        if len(w.tags) != 1:
+            problems.append(f"{name}: expected exactly one severity tag, found {len(w.tags)}")
+            continue
+        text = w.tags[0]["text"].strip()
+        if text != want or w.tags[0]["attr"] != want.lower():
+            problems.append(f"{name}: severity tag is '{text}' (data-severity {w.tags[0]['attr']}), expected {want}")
+        if "priority" in site.pages[name].lower():
+            problems.append(f"{name}: contains the word 'priority'")
+    return problems
+
+
 CHECKS = [check_balanced, check_links, check_no_empty_links,
-          check_nav, check_fast_lane, check_titles, check_case_files]
+          check_nav, check_fast_lane, check_titles, check_case_files,
+          check_severity]
 
 
 def main(argv):

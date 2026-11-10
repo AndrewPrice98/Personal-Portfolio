@@ -38,7 +38,7 @@
         <article class="case-file">
             <p class="case-back"><a href="../portfolio.html">&larr; All projects</a></p>
             <h1>NetGuard</h1>
-            <p class="case-meta"><span class="sev sev-high">Priority: High</span> <span>Network security, detection engineering</span> <span>Python (standard library), SQLite, MITRE ATT&amp;CK, pcap</span></p>
+            <p class="case-meta"><span class="sev sev-crit" data-severity="crit" title="Featured: flagship">CRIT</span> <span class="sev-note">Featured: flagship</span> <span>Network security, detection engineering</span> <span>Python (standard library), SQLite, MITRE ATT&amp;CK, pcap</span></p>
             <section class="case-section">
 <h2>Summary</h2>
 <p>NetGuard is a network intrusion detection system and SOC console for small networks, written in standard-library Python with no dependencies. It learns what a network normally looks like, flags the changes that signal an intruder or a man-in-the-middle, groups related alerts into incidents with an ATT&amp;CK-mapped attack chain, and measures how quickly and how accurately those alerts get handled. Every detection is proven by a replayable attack simulation that runs in CI.</p>
@@ -100,7 +100,8 @@
 <figure class="case-figure">
 <img src="../images/cases/netguard-dashboard.webp" alt="NetGuard overview dashboard on the demo network: open incidents, response-time metrics, alerts by day, a network map and the highest-risk devices" width="1200" height="958" loading="lazy">
 <figcaption>The demo network (<code>netguard demo</code>). The figures on screen come from fictional demo data.</figcaption>
-</figure><figure class="case-figure">
+</figure>
+<figure class="case-figure">
 <img src="../images/cases/netguard-detections.webp" alt="NetGuard Detections page: response metrics, ATT&amp;CK coverage by tactic, a per-rule fidelity table and attack simulation results" width="1200" height="1300" loading="lazy">
 <figcaption>The Detections page, the tuning view: response metrics, ATT&amp;CK coverage, per-rule true-positive rate and simulation results.</figcaption>
 </figure>
