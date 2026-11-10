@@ -285,9 +285,63 @@ def check_severity(site):
     return problems
 
 
+class TermWalker(HTMLParser):
+    """Finds .terminal, the text of its .term-output and the links in .term-chips."""
+
+    def __init__(self):
+        super().__init__()
+        self.depth, self.out_depth, self.chip_depth = 0, 0, 0
+        self.seen, self.output, self.chip_links = False, "", 0
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        classes = (a.get("class") or "").split()
+        if self.depth and tag not in VOID:
+            self.depth += 1
+            if self.out_depth:
+                self.out_depth += 1
+            if self.chip_depth:
+                self.chip_depth += 1
+        elif "terminal" in classes and not self.seen:
+            self.seen, self.depth = True, 1
+        if self.depth:
+            if "term-output" in classes and not self.out_depth:
+                self.out_depth = 1
+            if "term-chips" in classes and not self.chip_depth:
+                self.chip_depth = 1
+            if tag == "a" and self.chip_depth and a.get("href"):
+                self.chip_links += 1
+
+    def handle_endtag(self, tag):
+        if self.depth and tag not in VOID:
+            self.depth -= 1
+            self.out_depth = max(0, self.out_depth - 1)
+            self.chip_depth = max(0, self.chip_depth - 1)
+
+    def handle_data(self, data):
+        if self.out_depth:
+            self.output += data
+
+
+def check_terminal_fallback(site):
+    html = site.pages.get("index.html", "")
+    w = TermWalker()
+    w.feed(html)
+    w.close()
+    if not w.seen:
+        return ["index.html: no .terminal element"]
+    problems = []
+    for needle in ("Andrew T. Price II", "full-stack developer"):
+        if needle not in w.output:
+            problems.append(f"index.html: .term-output is missing '{needle}'")
+    if w.chip_links < 5:
+        problems.append(f"index.html: .term-chips has {w.chip_links} links, expected at least 5")
+    return problems
+
+
 CHECKS = [check_balanced, check_links, check_no_empty_links,
           check_nav, check_fast_lane, check_titles, check_case_files,
-          check_severity]
+          check_severity, check_terminal_fallback]
 
 
 def main(argv):

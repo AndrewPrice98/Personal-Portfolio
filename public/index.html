@@ -34,33 +34,35 @@
     </aside>
 
     <main class="container">
-        <section class="hero">
-            <p class="eyebrow">Full-stack web developer</p>
-            <h1 class="typed"><span class="typed-text">Hi, I'm Andrew.</span><span class="cursor" aria-hidden="true"></span></h1>
-            <p class="lead">I dabble in full-stack web development, creating applications with JavaScript, React, Node, and Express. I also enjoy exploring cybersecurity.</p>
-            <div class="hero-actions">
-                <a class="btn" href="portfolio.html">See my work</a>
-                <a class="btn btn-ghost" href="resume.html">Resume</a>
-                <a class="btn btn-ghost" href="https://github.com/AndrewPrice98" target="_blank" rel="noopener">GitHub</a>
-                <a class="btn btn-ghost" href="contact.html">Get in touch</a>
-            </div>
-        </section>
-
-        <section class="code-window" aria-label="About me">
-            <div class="code-titlebar">
+        <section class="terminal" id="top" aria-label="Interactive terminal">
+            <h1 class="visually-hidden">Andrew T. Price II</h1>
+            <div class="term-titlebar">
                 <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
-                <span class="code-filename">about.js</span>
+                <span class="term-title">andrew@portfolio: ~</span>
             </div>
-            <!-- Spacing inside <pre> shows on the page exactly as written, so keep these lines unindented. -->
-<pre class="code"><code><span class="tok-kw">const</span> <span class="tok-var">andrew</span> = {
-  <span class="tok-key">role</span>: <span class="tok-str">"Full-stack web developer, Aspiring Cybersecurity Professional"</span>,
-  <span class="tok-key">stack</span>: [<span class="tok-str">"JavaScript"</span>, <span class="tok-str">"React"</span>, <span class="tok-str">"Node"</span>, <span class="tok-str">"Express"</span>,<span class="tok-str">"Cybersecurity"</span>,<span class="tok-str">"SOC"</span>],
-  <span class="tok-key">currentlyLearning</span>: <span class="tok-str">"Networking"</span>,
-  <span class="tok-key">openToWork</span>: <span class="tok-kw">false</span>,
-};</code></pre>
+            <div class="term-body">
+                <p class="term-line"><span class="term-prompt">andrew@portfolio:~$</span> <span class="term-cmd">whoami</span></p>
+<pre class="term-output">Andrew T. Price II
+security analyst · full-stack developer · avionics technician</pre>
+                <div class="term-history"></div>
+                <div class="term-live" aria-live="polite"></div>
+            </div>
+            <div class="term-chips" role="group" aria-label="Terminal commands">
+                <a href="#top" data-cmd="whoami">whoami</a>
+                <a href="#projects" data-cmd="projects">projects</a>
+                <a href="resume.html" data-cmd="resume">resume</a>
+                <a href="contact.html" data-cmd="contact">contact</a>
+                <a href="#mission" data-cmd="mission">mission</a>
+                <a href="resume.html#highlights" data-cmd="certs">certs</a>
+            </div>
         </section>
 
-        <section>
+        <section class="mission" id="mission">
+            <p class="eyebrow">Mission</p>
+            <p class="lead">Open to work, aiming at SOC analyst and security engineering roles. I am currently a Full Stack Development Apprentice with Creating Coding Careers (a DOL registered apprenticeship), building on 5+ years of USAF avionics work.</p>
+        </section>
+
+        <section id="projects">
             <div class="section-head">
                 <h2>Web Development Projects</h2>
             </div>
@@ -198,6 +200,6 @@
         </div>
     </footer>
 
-    <script src="js/main.js" defer></script>
+    <script src="js/terminal.js" defer></script>
 </body>
 </html>
