@@ -214,7 +214,8 @@ def check_titles(site):
             if not (t := text_walk(html).title.strip()).endswith(TITLE_SUFFIX)]
 
 
-CASE_SLUGS = ["netguard", "minisiem", "cmmc-ready", "logingestllm", "ccna-study", "cysa-study",
+CASE_SLUGS = ["netguard", "minisiem", "cmmc-ready", "stigwatch", "purplebench", "ghosttrack",
+              "logingestllm", "ccna-study", "cysa-study",
               "job-tracker", "flight-tracker", "tempered", "sudo-snake"]
 CASE_SECTIONS = ["Summary", "Problem", "What I built", "How it works",
                  "Evidence", "What I'd do next", "Links"]
@@ -272,6 +273,7 @@ def check_case_files(site):
 
 
 SEVERITY = {"netguard": "CRIT", "minisiem": "CRIT", "cmmc-ready": "HIGH",
+            "stigwatch": "HIGH", "purplebench": "HIGH", "ghosttrack": "HIGH",
             "logingestllm": "HIGH", "ccna-study": "HIGH",
             "cysa-study": "HIGH", "job-tracker": "MED", "flight-tracker": "MED",
             "tempered": "MED", "sudo-snake": "MED"}
@@ -507,6 +509,8 @@ def check_map(site):
 
 QUEUE_FEATURED = {"NetGuard": "projects/netguard.html", "MiniSIEM": "projects/minisiem.html",
                   "CMMC Ready": "projects/cmmc-ready.html",
+                  "STIGWatch": "projects/stigwatch.html", "PurpleBench": "projects/purplebench.html",
+                  "GhostTrack": "projects/ghosttrack.html",
                   "LogIngestLLM": "projects/logingestllm.html",
                   "CySA+ Study": "projects/cysa-study.html", "CCNA Study": "projects/ccna-study.html",
                   "Job Tracker": "projects/job-tracker.html",
@@ -519,8 +523,8 @@ QUEUE_COURSEWORK = {"Card Scanner": "https://github.com/AndrewPrice98/Card-Scann
                     "Mortgage Calculator": "https://github.com/AndrewPrice98/React100MortgageCalc"}
 # The home page shows only the top featured rows, so a recruiter can scan it;
 # portfolio.html lists every project.
-QUEUE_HOME = ["NetGuard", "MiniSIEM", "CMMC Ready", "LogIngestLLM", "CySA+ Study",
-              "CCNA Study", "Job Tracker", "Military Flight Tracker"]
+QUEUE_HOME = ["NetGuard", "MiniSIEM", "CMMC Ready", "STIGWatch", "PurpleBench", "GhostTrack",
+              "LogIngestLLM", "CCNA Study"]
 QUEUE_HOME_MAX = 8
 QUEUE_SEVERITIES = {"crit", "high", "med", "info"}
 

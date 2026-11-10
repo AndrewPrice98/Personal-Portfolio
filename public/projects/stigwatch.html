@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>STIGWatch case file | Andrew T. Price II</title>
+    <meta name="description" content="STIGWatch: a DISA STIG compliance scanner for Ubuntu 22.04 and Windows Server 2022 that tracks drift by STIG ID, alerts on CAT I regressions, and generates remediation it never applies.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b0e14'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='20' font-weight='700' text-anchor='middle' fill='%235fb8c7'%3E~/%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container nav">
+            <a class="brand" href="../index.html"><span>Andrew T. Price II</span></a>
+            <nav aria-label="Main">
+                <a href="../index.html">Home</a>
+                <a href="../portfolio.html" aria-current="true">Projects</a>
+                <a href="../resume.html">Resume</a>
+                <a href="../contact.html">Contact</a>
+            </nav>
+        </div>
+    </header>
+    <aside class="fast-lane" aria-label="At a glance">
+        <div class="container fast-lane-inner">
+            <p class="fast-lane-facts">Active DoD Secret clearance &middot; CompTIA Security+ (IAT II) &middot; 5+ yrs USAF avionics &middot; Full-stack developer</p>
+            <div class="fast-lane-actions">
+                <span class="badge-open">open to work</span>
+                <a class="fl-resume" href="../resume.html">Resume</a>
+                <a class="fl-linkedin" href="https://www.linkedin.com/in/andrew-price98" target="_blank" rel="noopener">LinkedIn <span class="visually-hidden">(opens in a new tab)</span></a>
+                <a class="fl-contact" href="../contact.html">Contact</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="container">
+        <article class="case-file">
+            <p class="case-back"><a href="../portfolio.html">&larr; All projects</a></p>
+            <h1>STIGWatch</h1>
+            <p class="case-meta"><span class="sev sev-high" data-severity="high" title="Featured: strong">HIGH</span> <span class="sev-note">Featured: strong</span> <span>Compliance, DISA STIGs, configuration drift, full stack</span> <span>Python, FastAPI, SQLite, React, Vite, PowerShell, POSIX shell</span></p>
+            <section class="case-section">
+<h2>Summary</h2>
+<p>STIGWatch is a DISA STIG compliance scanner for Ubuntu 22.04 LTS (STIG V2R10, 191 rules) and Windows Server 2022 (STIG V2R11, 277 rules) that tracks how a fleet changes from one scan to the next. Read-only collectors gather facts from a host, a declarative check engine turns them into per-rule results, and each scan is compared with the host's previous one by STIG ID. A CAT I rule that goes from closed to Open raises an alert. It also generates remediation you review and run yourself, and exports STIG Viewer checklists (CKL and CKLB) and fleet reports.</p>
+<p class="case-note">STIGWatch is an independent tool. It is not a DISA product and does not replace the SCAP Compliance Checker, Evaluate-STIG or an assessor's review.</p>
+            </section>
+            <section class="case-section">
+<h2>Problem</h2>
+<p>DoD systems have to be configured to the STIG for their platform, and each rule carries a severity: CAT I is a vulnerability whose exploitation directly and immediately causes a loss of confidentiality, availability or integrity. A single scan tells you where a host stands today. What a system owner also needs is the change: which settings drifted open since last week, which were fixed, and whether anything serious came back.</p>
+<p>That comparison is easy to get wrong. A new benchmark release renumbers and reshuffles rules, a scan without root cannot read half the facts, and a rule that merely became unreadable looks like a rule that was fixed. I wanted a tool that matches rules by STIG ID, never counts lost visibility as a fix, and treats anything it cannot prove as Not Reviewed instead of a pass.</p>
+            </section>
+            <section class="case-section">
+<h2>What I built</h2>
+<ul>
+<li><strong>Read-only collectors.</strong> A POSIX shell script for Ubuntu and a PowerShell 5.1 and 7 script for Windows. Each fact records the command that produced it, a fact that cannot be read is recorded as unavailable, password hashes are never output, and account names can be redacted. The README lists every command each collector runs.</li>
+<li><strong>A declarative check engine.</strong> Rules are YAML checks over collector facts. Of the 191 Ubuntu rules, 174 have an automated check; of the 277 Windows rules, 254 do (229 of them can decide a result). The rest are Manual review and show the STIG check text. The coverage table is generated from the engine, and CI fails when it is stale.</li>
+<li><strong>Drift by STIG ID.</strong> Between two scans every rule lands in exactly one bucket: regressed, fixed, newly open, lost visibility, other change or unchanged. A rule present in only one benchmark release is listed as new or removed, never as fixed or regressed.</li>
+<li><strong>CAT I regression alerts.</strong> A CAT I rule that was Not a Finding or Not Applicable and is Open now raises an alert. Out-of-order uploads are accepted and the alerts around them are recomputed.</li>
+<li><strong>Remediation it never applies.</strong> An Ansible playbook for Ubuntu (109 of 191 rules) and a PowerShell script for Windows (150 of 277), generated from each rule's check definition. A rule with any condition lacking a safe mapping is listed as manual. The Windows script is a dry run unless <code>-Apply</code> is passed, and changes that affect who may connect need <code>-IncludeAccessChanges</code> as well.</li>
+<li><strong>Exports.</strong> A checklist per scan as <code>.ckl</code> (STIG Viewer 2 XML) and <code>.cklb</code> (STIG Viewer 3 JSON), plus fleet summaries as CSV and a self-contained HTML report.</li>
+<li><strong>Hardening.</strong> Uploaded JSON is treated as untrusted (size caps, depth limit, content-type checks), PBKDF2-SHA256 hashes, an httpOnly SameSite=Strict session cookie, a read-only guest mode that refuses writes, a strict Content-Security-Policy and remediation text that is only ever shown as plain text.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>How it works</h2>
+<ol>
+<li><strong>Collect and upload.</strong> The collector writes one JSON file and never connects to STIGWatch. An admin uploads it, and the host is matched by the name in the file or created.</li>
+<li><strong>Evaluate.</strong> Checks run over the facts with the statuses STIG Viewer uses: Open, Not a Finding, Not Applicable and Not Reviewed. A rule STIGWatch cannot prove either way is Not Reviewed, never a pass.</li>
+<li><strong>Compare.</strong> The scan is compared with the host's previous one by STIG ID. Open to Not Reviewed (for example a collector run without root) is its own bucket, lost visibility, and is never counted as fixed.</li>
+<li><strong>Review and act.</strong> Findings are grouped by STIG ID across the fleet, assessors can attach comments that persist across scans, and remediation and checklists are generated for a person to review.</li>
+</ol>
+<div class="table-wrap"><table>
+<thead><tr><th>Benchmark</th><th>Rules</th><th>Automated checks</th><th>Manual review</th><th>Generated remediation</th></tr></thead>
+<tbody>
+<tr><td>Ubuntu 22.04 LTS V2R10</td><td>191</td><td>174</td><td>17</td><td>109</td></tr>
+<tr><td>Windows Server 2022 V2R11</td><td>277</td><td>254</td><td>23</td><td>150</td></tr>
+</tbody>
+</table></div>
+<figure class="case-figure">
+<img src="../images/cases/stigwatch-drift.webp" alt="STIGWatch Drift page for the demo fleet: four CAT I regression alerts in week 6, such as WN22-SO-000210 on file-01 going from Not a finding to Open, above a fleet timeline of eight weekly scans" width="1200" height="771" loading="lazy">
+<figcaption>The Drift page: four CAT I regressions in week 6 of the demo fleet, each linked to its host, above the weekly timeline of open findings by category.</figcaption>
+</figure>
+            </section>
+            <section class="case-section">
+<h2>Evidence</h2>
+<p>The demo is a fictional fleet of 14 invented hosts with 8 weekly scans each (112 scans). It is built so that week 6 contains four CAT I regressions across two hosts, and the Fleet page opens on them.</p>
+<p>336 backend tests are collected (332 passed and 4 platform-specific skips, with pytest), alongside 29 frontend unit tests and a small Playwright smoke test that checks guests are read-only and that a rule that lost visibility is never shown as fixed. CI runs the backend tests, the benchmark, coverage and demo checks, the frontend tests and build, the smoke test, <code>pip-audit</code>, <code>npm audit</code> and a gitleaks scan. It also runs the real collectors: the Ubuntu one on an <code>ubuntu-22.04</code> runner, and the Windows one on <code>windows-2022</code> under both PowerShell 7 and Windows PowerShell 5.1. Generated playbooks go through <code>ansible-playbook --syntax-check</code> and <code>ansible-lint</code>, and generated scripts through the PowerShell parser and a dry run.</p>
+<figure class="case-figure">
+<img src="../images/cases/stigwatch-fleet.webp" alt="STIGWatch Fleet overview for 14 hosts and 112 scans: a start-here panel reporting that 4 CAT I rules regressed on file-01 and web-01 in week 6, with the affected rules and their latest status" width="1200" height="771" loading="lazy">
+<figcaption>The Fleet page opens on what needs attention: the week 6 regressions, which are still open and which closed again.</figcaption>
+</figure>
+<figure class="case-figure">
+<img src="../images/cases/stigwatch-remediation.webp" alt="STIGWatch Remediation page for host bkp-01: a warning to review before applying and test on a non-production host, above a generated PowerShell script that is a dry run unless -Apply is given" width="1200" height="771" loading="lazy">
+<figcaption>Generated remediation for one host: a review warning first, then a script that does nothing unless it is run with <code>-Apply</code>.</figcaption>
+</figure>
+            </section>
+            <section class="case-section">
+<h2>What I'd do next</h2>
+<ul>
+<li><strong>Open the checklists in STIG Viewer.</strong> The CKL and CKLB exports follow DISA's published field names and third-party samples, but have not yet been opened in STIG Viewer itself.</li>
+<li><strong>Validate on a real fleet.</strong> Checks are validated against GitHub's <code>ubuntu-22.04</code> and <code>windows-2022</code> runners and fixtures, not a production fleet. A result is evidence to review, not a verdict.</li>
+<li><strong>More coverage.</strong> 174 of 191 Ubuntu rules and 254 of 277 Windows rules have a check today, and only two benchmarks are loaded. Newer DISA releases can be imported, but rules they add stay Not Reviewed until a check is written.</li>
+<li><strong>Scale.</strong> The Drift and Findings pages load per-host data in the browser, which suits tens of hosts rather than hundreds.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>Links</h2>
+<ul class="case-links">
+<!-- LIVE_DEMO: add https://stigwatch.vercel.app/ after deploy -->
+<li><a class="btn btn-small" href="https://github.com/AndrewPrice98/STIGWatch" target="_blank" rel="noopener">Code on GitHub</a></li>
+<li><a class="btn btn-small btn-ghost" href="https://github.com/AndrewPrice98/STIGWatch/blob/main/docs/COVERAGE.md" target="_blank" rel="noopener">Coverage by severity</a></li>
+<li><a class="btn btn-small btn-ghost" href="https://github.com/AndrewPrice98/STIGWatch/blob/main/DECISIONS.md" target="_blank" rel="noopener">Design decisions</a></li>
+<li><a class="btn btn-small btn-ghost" href="../portfolio.html">Back to all projects</a></li>
+</ul>
+            </section>
+        </article>
+    </main>
+
+    <footer class="site-footer status-bar">
+        <div class="status-left">
+            <span class="status-branch">&#x2387; main</span>
+            <span class="status-ok">&#x2713; 0 errors</span>
+            <span>&copy; 2026 Andrew T. Price II</span>
+        </div>
+        <div class="status-right">
+            <span class="status-extra">UTF-8</span>
+            <span class="status-extra">HTML</span>
+            <a href="https://github.com/AndrewPrice98" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+
+</body>
+</html>

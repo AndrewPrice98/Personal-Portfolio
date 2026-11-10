@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GhostTrack case file | Andrew T. Price II</title>
+    <meta name="description" content="GhostTrack: an ADS-B spoofing and anomaly detector for public civil air traffic around LAX, with ten catalogued detections, seven validated injected scenarios, a documented detection gap and a measured false-positive budget.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b0e14'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='20' font-weight='700' text-anchor='middle' fill='%235fb8c7'%3E~/%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container nav">
+            <a class="brand" href="../index.html"><span>Andrew T. Price II</span></a>
+            <nav aria-label="Main">
+                <a href="../index.html">Home</a>
+                <a href="../portfolio.html" aria-current="true">Projects</a>
+                <a href="../resume.html">Resume</a>
+                <a href="../contact.html">Contact</a>
+            </nav>
+        </div>
+    </header>
+    <aside class="fast-lane" aria-label="At a glance">
+        <div class="container fast-lane-inner">
+            <p class="fast-lane-facts">Active DoD Secret clearance &middot; CompTIA Security+ (IAT II) &middot; 5+ yrs USAF avionics &middot; Full-stack developer</p>
+            <div class="fast-lane-actions">
+                <span class="badge-open">open to work</span>
+                <a class="fl-resume" href="../resume.html">Resume</a>
+                <a class="fl-linkedin" href="https://www.linkedin.com/in/andrew-price98" target="_blank" rel="noopener">LinkedIn <span class="visually-hidden">(opens in a new tab)</span></a>
+                <a class="fl-contact" href="../contact.html">Contact</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="container">
+        <article class="case-file">
+            <p class="case-back"><a href="../portfolio.html">&larr; All projects</a></p>
+            <h1>GhostTrack</h1>
+            <p class="case-meta"><span class="sev sev-high" data-severity="high" title="Featured: strong">HIGH</span> <span class="sev-note">Featured: strong</span> <span>Anomaly detection, aviation cybersecurity, full stack</span> <span>Python, FastAPI, SQLite, React, Vite, adsb.lol (ODbL)</span></p>
+            <section class="case-section">
+<h2>Summary</h2>
+<p>GhostTrack is an ADS-B plausibility detector. It watches decoded public civil air traffic within 60 NM of Los Angeles (LAX) from adsb.lol and runs ten physical and consistency checks on every aircraft: speeds no airliner can fly, positions that teleport, one address in two places, an address that belongs to the wrong country, a sudden flood of aircraft. Every finding shows the evidence, the threshold it crossed and the benign causes that could produce the same picture. It is validated against seven injected attack scenarios, measured for false positives on real recordings, and honest about the one attack it cannot see.</p>
+<p class="case-note">GhostTrack is a portfolio project, not a certified surveillance system. It uses civil traffic only, has no radio or transmit code, and everything it flags has benign explanations. A flag is a reason to look, not a verdict.</p>
+            </section>
+            <section class="case-section">
+<h2>Problem</h2>
+<p>ADS-B Out is mandatory in much of US airspace, and the broadcasts are unauthenticated: a receiver cannot tell a genuine report from a fabricated one by the message alone. Researchers have shown ghost injection, flooding and message modification on bench and lab setups (Costin and Francillon at Black Hat USA 2012, Schafer, Lenders and Martinovic at ACNS 2013, and the Strohmeier survey in IEEE Communications Surveys and Tutorials 2015).</p>
+<p>The stronger defenses, such as multilateration across receivers, need per-receiver timestamps that aggregated public data does not carry. I wanted to see how far a single-receiver plausibility layer gets on that data, how quickly it catches each documented attack, how often it cries wolf on real traffic, and where it is blind.</p>
+            </section>
+            <section class="case-section">
+<h2>What I built</h2>
+<ul>
+<li><strong>Ten catalogued detections.</strong> GT-001 to GT-010: impossible ground speed, vertical rate and turn rate, position jump, duplicate ICAO address, address allocation mismatch, barometric versus geometric altitude divergence, emergency squawk without matching behavior, ghost flood and integrity indicators dropping to zero. All thresholds live in one catalog file, and the detections page and the code read the same numbers.</li>
+<li><strong>Tracking by ICAO address</strong> using the true position time rather than the poll time, so a late or repeated report cannot fake a jump. Records are sanitized, and bad addresses, out-of-range positions and duplicates are dropped and counted.</li>
+<li><strong>Explained alerts.</strong> Severity, confidence, the observed value against the threshold, the possible benign causes, triage (acknowledge or dismiss) and an evidence pack as JSON or standalone HTML.</li>
+<li><strong>A validation harness.</strong> <code>python -m ghosttrack validate</code> injects seven documented scenarios into recorded traffic and measures detections, collateral findings and the false-positive rate. CI fails if a scenario is missed or the budget is exceeded. Everything injected is labeled "Injected test data" wherever it appears.</li>
+<li><strong>A map with no third parties.</strong> Hand-drawn SVG from a bundled public-domain outline, no map tiles, no external fonts, and a Content-Security-Policy that allows no other origin.</li>
+<li><strong>Hardening.</strong> The only outbound host is a constant in the code, with a path built from numbers only, redirects refused, HTTPS enforced and a 5 MB body cap. PBKDF2-SHA256 hashing, an httpOnly SameSite=Strict cookie, parameterized SQL and a read-only guest mode.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>How it works</h2>
+<ol>
+<li><strong>Ingest.</strong> Live mode fetches civil aircraft inside 60 NM of LAX from adsb.lol, at most one request per region per 10 seconds. Demo mode replays committed recordings, and two further daytime recordings feed validation only.</li>
+<li><strong>Track and detect.</strong> GT-001 to GT-010 run over every track, and GT-009 over the whole fleet. A check whose inputs are missing is not evaluated, so it can never raise an alert.</li>
+<li><strong>Triage.</strong> Findings become alerts with the evidence and the benign causes beside them. MLAT and TIS-B positions get looser thresholds and lower confidence because they are less precise.</li>
+<li><strong>Validate.</strong> The scenarios are replayed into recorded traffic and the output of the real validation run is pasted into the README, where a test fails if it drifts from what the program prints.</li>
+</ol>
+<div class="table-wrap"><table>
+<thead><tr><th>Scenario</th><th>Expected</th><th>Fired</th><th>Time to detect</th></tr></thead>
+<tbody>
+<tr><td>single_ghost</td><td>GT-001</td><td>GT-001, GT-004</td><td>15 s</td></tr>
+<tr><td>ghost_flood</td><td>GT-009</td><td>GT-009</td><td>0 s</td></tr>
+<tr><td>icao_hijack</td><td>GT-005</td><td>GT-004, GT-005</td><td>10 s</td></tr>
+<tr><td>position_offset</td><td>GT-004</td><td>GT-004</td><td>0 s</td></tr>
+<tr><td>teleport</td><td>GT-004</td><td>GT-004</td><td>0 s</td></tr>
+<tr><td>altitude_spoof</td><td>GT-007</td><td>GT-007</td><td>20 s</td></tr>
+<tr><td>registration_mismatch</td><td>GT-006</td><td>GT-006</td><td>0 s</td></tr>
+<tr><td>gradual_drift (documented gap)</td><td>none</td><td>none: gap holds</td><td>not detected</td></tr>
+</tbody>
+</table></div>
+<figure class="case-figure">
+<img src="../images/cases/ghosttrack-scenario.webp" alt="GhostTrack scenario replay of a single ghost aircraft: an injected test data banner, a map of the Los Angeles area with a fabricated track crossing the sea, and the detections GT-001 and GT-004 firing with their validated times" width="1200" height="771" loading="lazy">
+<figcaption>Replaying the single-ghost scenario: a fabricated airliner at 1,350 kt, the two detections that fire, and the validated time to detect.</figcaption>
+</figure>
+            </section>
+            <section class="case-section">
+<h2>Evidence</h2>
+<p>All seven injected scenarios are detected. Time to detect is measured at snapshot granularity (about 5 to 6 seconds in the recordings), and 0 s means detected on the first injected report.</p>
+<p>One scenario is expected not to fire. In <code>gradual_drift</code> a real track is dragged 0.1 NM per poll, which stays inside every kinematic limit, so single-receiver plausibility checks cannot see it. It is kept as a documented gap: validation reports "gap holds", and if a future change makes it fire, validation fails until the scenario is promoted.</p>
+<p>The false-positive budget counts only findings of severity medium or high, and is the larger of 1.0 per hour and 1.5 times the measured rate. Across five recordings the counted rate is 0 per hour, so the budget sits at its 1.0 per hour floor. The two daytime recordings do produce low-severity GT-010 findings, which are listed and not budgeted.</p>
+<p>530 backend tests and 41 frontend tests pass, and CI runs the validation, the recordings manifest check, <code>pip-audit</code>, <code>npm audit</code> and gitleaks.</p>
+<figure class="case-figure">
+<img src="../images/cases/ghosttrack-alert-detail.webp" alt="GhostTrack alert detail for a position jump: the observed 1,592 kt implied speed against the 960 kt threshold, the possible benign causes, an evidence pack download, and the track drawn on a map of the Los Angeles area, marked as injected test data" width="1200" height="1348" loading="lazy">
+<figcaption>An alert: what failed, observed against threshold, the benign causes to rule out first, and an evidence pack to export. This one is injected test data.</figcaption>
+</figure>
+            </section>
+            <section class="case-section">
+<h2>What I'd do next</h2>
+<ul>
+<li><strong>A thicker false-positive baseline.</strong> The measurement comes from five 20-minute recordings, about 1.7 hours in total: three overnight and two from one weekday morning. No other days, weekends or evening peaks, so the 1.0 per hour budget is a floor, not an earned figure.</li>
+<li><strong>Cross-receiver checks.</strong> The strongest defense, comparing arrival times at several receivers, needs raw per-receiver timestamps that this data does not carry, so the drift scenario stays a known blind spot.</li>
+<li><strong>Better exclusions.</strong> The point endpoint did not deliver the flags the exclusion filter prefers, so it falls back to an address block and other non-civil traffic may appear.</li>
+<li><strong>Real-world evidence.</strong> The scenarios are synthetic. They show the checks working on the attacks they were written for, not how common those attacks are.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>Links</h2>
+<ul class="case-links">
+<!-- LIVE_DEMO: add https://ghosttrack.vercel.app/ after deploy -->
+<li><a class="btn btn-small" href="https://github.com/AndrewPrice98/GhostTrack" target="_blank" rel="noopener">Code on GitHub</a></li>
+<li><a class="btn btn-small btn-ghost" href="https://github.com/AndrewPrice98/GhostTrack/blob/main/DECISIONS.md" target="_blank" rel="noopener">Design decisions</a></li>
+<li><a class="btn btn-small btn-ghost" href="https://github.com/AndrewPrice98/GhostTrack/blob/main/THIRD_PARTY.md" target="_blank" rel="noopener">Data sources and licences</a></li>
+<li><a class="btn btn-small btn-ghost" href="../portfolio.html">Back to all projects</a></li>
+</ul>
+            </section>
+        </article>
+    </main>
+
+    <footer class="site-footer status-bar">
+        <div class="status-left">
+            <span class="status-branch">&#x2387; main</span>
+            <span class="status-ok">&#x2713; 0 errors</span>
+            <span>&copy; 2026 Andrew T. Price II</span>
+        </div>
+        <div class="status-right">
+            <span class="status-extra">UTF-8</span>
+            <span class="status-extra">HTML</span>
+            <a href="https://github.com/AndrewPrice98" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+
+</body>
+</html>

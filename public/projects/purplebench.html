@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PurpleBench case file | Andrew T. Price II</title>
+    <meta name="description" content="PurpleBench: purple-team detection validation that replays recorded Sysmon telemetry against SigmaHQ and custom Sigma rules with its own evaluator, scores ATT&amp;CK v20 coverage, tracks gaps and exports a Navigator layer.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b0e14'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='20' font-weight='700' text-anchor='middle' fill='%235fb8c7'%3E~/%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container nav">
+            <a class="brand" href="../index.html"><span>Andrew T. Price II</span></a>
+            <nav aria-label="Main">
+                <a href="../index.html">Home</a>
+                <a href="../portfolio.html" aria-current="true">Projects</a>
+                <a href="../resume.html">Resume</a>
+                <a href="../contact.html">Contact</a>
+            </nav>
+        </div>
+    </header>
+    <aside class="fast-lane" aria-label="At a glance">
+        <div class="container fast-lane-inner">
+            <p class="fast-lane-facts">Active DoD Secret clearance &middot; CompTIA Security+ (IAT II) &middot; 5+ yrs USAF avionics &middot; Full-stack developer</p>
+            <div class="fast-lane-actions">
+                <span class="badge-open">open to work</span>
+                <a class="fl-resume" href="../resume.html">Resume</a>
+                <a class="fl-linkedin" href="https://www.linkedin.com/in/andrew-price98" target="_blank" rel="noopener">LinkedIn <span class="visually-hidden">(opens in a new tab)</span></a>
+                <a class="fl-contact" href="../contact.html">Contact</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="container">
+        <article class="case-file">
+            <p class="case-back"><a href="../portfolio.html">&larr; All projects</a></p>
+            <h1>PurpleBench</h1>
+            <p class="case-meta"><span class="sev sev-high" data-severity="high" title="Featured: strong">HIGH</span> <span class="sev-note">Featured: strong</span> <span>Detection engineering, purple team, full stack</span> <span>Python, FastAPI, SQLite, React, Vite, Sigma, MITRE ATT&amp;CK, PowerShell</span></p>
+            <section class="case-section">
+<h2>Summary</h2>
+<p>PurpleBench is purple-team detection validation for Windows. It takes a list of MITRE ATT&amp;CK techniques, replays recorded Sysmon telemetry for each one against a set of Sigma rules using its own evaluator, and reports per technique whether a rule fired, with the rule's author shown beside every match. The result is a measured coverage number for this rule set on this telemetry, a list of gaps with the telemetry and rule idea that would close each one, and exports: HTML and Markdown reports and an ATT&amp;CK Navigator layer. The rule set is 58 rules from SigmaHQ plus 12 custom rules I wrote.</p>
+<p class="case-note">Everything in the demo is recorded mode. No command is executed and no lab is used. The telemetry is Windows Sysmon events that other people recorded when they ran Atomic Red Team tests (Splunk attack_data), and "missed" means no rule in the set fired on that recording. It says nothing about any product or about your environment.</p>
+            </section>
+            <section class="case-section">
+<h2>Problem</h2>
+<p>Detection rules are easy to collect and hard to trust. Having a rule is not the same as seeing the behavior it is meant to catch: a rule can depend on a field the telemetry does not have, fire on benign activity, or never match a real run of the technique. The only way to know is to run the behavior, or replay a recording of it, and look at what fires.</p>
+<p>I wanted the small, honest version of that check: name the rule set, name the telemetry, say what fired, and keep a list of what did not, with the rule idea that would close each gap. It also had to keep "the rule cannot see this telemetry" apart from "the rule failed".</p>
+            </section>
+            <section class="case-section">
+<h2>What I built</h2>
+<ul>
+<li><strong>A Sigma evaluator.</strong> Written from the Sigma Rules Specification 2.1.0 rather than wrapping pySigma. It supports maps and lists, <code>contains</code>, <code>startswith</code>, <code>endswith</code>, <code>all</code>, <code>windash</code>, <code>re</code>, wildcards and the usual condition logic over Windows process creation, registry, file, network, process access, PowerShell script, Security and System sources. A rule outside the subset loads as <code>unsupported</code> with the exact reason and is never evaluated as "no match" (4 of the 70 bundled rules today).</li>
+<li><strong>A rule set with provenance.</strong> 58 SigmaHQ rules bundled unmodified and 12 custom rules for gaps the SigmaHQ set leaves on this telemetry. Every place a match is shown also shows the rule's author, as the Detection Rule License requires.</li>
+<li><strong>Honest scoring.</strong> Each technique is <code>detected</code>, <code>partial</code>, <code>missed</code>, <code>telemetry_gap</code>, <code>untested</code> or <code>did_not_run</code>. Coverage is detected divided by tested. A rule that also fires on the benign baseline is noisy and never earns <code>detected</code>.</li>
+<li><strong>Gap tracking.</strong> Each missed, partial or telemetry-gap technique becomes a gap with the telemetry needed and a rule idea. In the demo a gap closes when a later run of the same campaign detects the technique.</li>
+<li><strong>ATT&amp;CK v20 coverage and exports.</strong> A coverage matrix by tactic, run-to-run comparison, a Navigator layer (format 4.5), and HTML and Markdown reports.</li>
+<li><strong>A lab runner behind gates.</strong> A PowerShell runner that you run yourself, only against an allow-listed disposable VM that carries a registry marker, after typing the target name, with a WinRM credential, and with cleanup after each test. CI parses it with the PowerShell AST and applies an allow-list of the commands, .NET calls and parameters it may use.</li>
+<li><strong>Hardening.</strong> Windows Event XML parsed with <code>defusedxml</code> and DTDs refused, schema-validated size-capped run files, a 50 ms time limit and per-rule budget on regular expressions after a static pattern check, parameterized SQL, PBKDF2 hashes, a read-only guest mode and a strict Content-Security-Policy.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>How it works</h2>
+<ol>
+<li><strong>Pick a campaign.</strong> A list of techniques. The demo has two: initial access to credential theft, and ransomware precursors.</li>
+<li><strong>Replay.</strong> Each run evaluates one rule set version over the recorded telemetry for every technique in the campaign. Recorded runs are computed at build time by the real evaluator into a fixture that CI checks.</li>
+<li><strong>Score.</strong> Per technique, the rules that fired are credited by their ATT&amp;CK tags: an exact match is <code>detected</code>, a parent or related technique is <code>partial</code>. A rule that cannot see its telemetry (missing channel, event id or field) makes the technique a <code>telemetry_gap</code>, not a miss.</li>
+<li><strong>Close the gaps.</strong> The gap list says what telemetry and rule would close each miss, and the next rule set version is run against the same recordings.</li>
+</ol>
+<div class="table-wrap"><table>
+<thead><tr><th>Rule set</th><th>All techniques</th><th>Credential theft campaign</th><th>Ransomware campaign</th></tr></thead>
+<tbody>
+<tr><td>v1</td><td>9 of 25 (36.0%)</td><td>6 of 14 (42.9%)</td><td>5 of 14 (35.7%)</td></tr>
+<tr><td>v2</td><td>13 of 25 (52.0%)</td><td>6 of 14 (42.9%)</td><td>9 of 14 (64.3%)</td></tr>
+<tr><td>v3</td><td>18 of 25 (72.0%)</td><td>10 of 14 (71.4%)</td><td>11 of 14 (78.6%)</td></tr>
+<tr><td>v4</td><td>22 of 25 (88.0%)</td><td>13 of 14 (92.9%)</td><td>12 of 14 (85.7%)</td></tr>
+</tbody>
+</table></div>
+<figure class="case-figure">
+<img src="../images/cases/purplebench-coverage.webp" alt="PurpleBench ATT&amp;CK coverage page for run 4, the ransomware precursors campaign: 85.7 percent, 12 of 14 tested techniques detected, laid out by ATT&amp;CK v20 tactic with a change-since-run-2 table showing three improved techniques" width="1200" height="1545" loading="lazy">
+<figcaption>Run 4 against the ATT&amp;CK v20 tactics, and what changed since run 2: 64.3% to 85.7%, three techniques improved, none regressed.</figcaption>
+</figure>
+            </section>
+            <section class="case-section">
+<h2>Evidence</h2>
+<p>The four demo runs show coverage rising from 9 of 25 techniques (36.0%) with the first rule set to 22 of 25 (88.0%) with the fourth. That v4 figure is a best case, not a generalization: the 12 custom rules were written for gaps on these same recordings, so it shows what this rule set achieves on known telemetry, not how it would do on unseen attacks or in another environment.</p>
+<p>The telemetry is Splunk attack_data (Apache-2.0) covering 26 techniques over 11 tactics, trimmed to each test window, plus a benign baseline. One technique, Kerberoasting (T1558.003), is untested because the trimmed file has no Kerberoasting events.</p>
+<p>693 backend tests pass (pytest), alongside 47 frontend unit tests and a production build. The lab runner's static safety check has a self-test of 209 cases (the unchanged runner, 154 appended bypass attempts, 15 inside the remote script blocks, 38 weakened gates and a fixture file) that proves the checker fails on each. CI also runs <code>pip-audit</code>, <code>npm audit</code>, gitleaks and the data checks that keep the catalog, the coverage document and the demo fixture current.</p>
+<figure class="case-figure">
+<img src="../images/cases/purplebench-gaps.webp" alt="PurpleBench detection gaps page: 19 gaps with 12 open and 7 closed, each missed technique such as T1059.001 PowerShell and T1548.002 Bypass User Account Control shown with the telemetry needed and a rule idea" width="1200" height="1382" loading="lazy">
+<figcaption>The gap list: each miss with the telemetry that would be needed, a rule idea, and the run that closed it, if one did.</figcaption>
+</figure>
+<figure class="case-figure">
+<img src="../images/cases/purplebench-rule.webp" alt="PurpleBench rule page for a custom rule, LSASS Opened By A Process Running From A User-Writable Folder, showing its author, ATT&amp;CK technique T1003.001, the runs where it fired and the Sigma YAML the evaluator read" width="1200" height="1269" loading="lazy">
+<figcaption>A custom rule with its author, the run where it fired and the exact YAML the evaluator read.</figcaption>
+</figure>
+            </section>
+            <section class="case-section">
+<h2>What I'd do next</h2>
+<ul>
+<li><strong>Run lab mode against a real lab.</strong> The runner, the run-file format and the importer are tested statically and with synthetic run files only. It has not yet been run against a real lab, so expect rough edges on a first run.</li>
+<li><strong>Fresh telemetry.</strong> The recordings are 2020 to 2022 attack_range runs, one per technique. Recording my own runs would test the rules on data they were not written against.</li>
+<li><strong>More of Sigma.</strong> The <code>base64offset</code> and <code>cidr</code> modifiers, correlation rules and <code>fieldref</code> are outside the subset today.</li>
+<li><strong>Close the open gaps.</strong> Twelve gaps remain open in the demo, including Bypass User Account Control, Rundll32, Security Account Manager and a telemetry gap on Pass the Hash.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>Links</h2>
+<ul class="case-links">
+<!-- LIVE_DEMO: add https://purplebench.vercel.app/ after deploy -->
+<li><a class="btn btn-small" href="https://github.com/AndrewPrice98/PurpleBench" target="_blank" rel="noopener">Code on GitHub</a></li>
+<li><a class="btn btn-small btn-ghost" href="https://github.com/AndrewPrice98/PurpleBench/blob/main/docs/COVERAGE.md" target="_blank" rel="noopener">Rule inventory and coverage</a></li>
+<li><a class="btn btn-small btn-ghost" href="https://github.com/AndrewPrice98/PurpleBench/blob/main/DECISIONS.md" target="_blank" rel="noopener">Design decisions</a></li>
+<li><a class="btn btn-small btn-ghost" href="../portfolio.html">Back to all projects</a></li>
+</ul>
+            </section>
+        </article>
+    </main>
+
+    <footer class="site-footer status-bar">
+        <div class="status-left">
+            <span class="status-branch">&#x2387; main</span>
+            <span class="status-ok">&#x2713; 0 errors</span>
+            <span>&copy; 2026 Andrew T. Price II</span>
+        </div>
+        <div class="status-right">
+            <span class="status-extra">UTF-8</span>
+            <span class="status-extra">HTML</span>
+            <a href="https://github.com/AndrewPrice98" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+
+</body>
+</html>
