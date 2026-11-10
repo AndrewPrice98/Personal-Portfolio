@@ -397,9 +397,69 @@ def check_mission(site):
     return problems
 
 
+class MapWalker(HTMLParser):
+    """Collects hrefs of <a> inside #map's <svg> and .net-map-list."""
+
+    def __init__(self):
+        super().__init__()
+        self.depth, self.seen, self.svgs, self.lists = 0, 0, 0, 0
+        self.in_svg, self.in_list = 0, 0
+        self.svg_hrefs, self.list_hrefs = [], []
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        if self.depth:
+            if tag not in VOID:
+                self.depth += 1
+            if tag == "svg":
+                self.svgs += 1
+                self.in_svg = self.depth
+            if tag == "ul" and "net-map-list" in (a.get("class") or "").split():
+                self.lists += 1
+                self.in_list = self.depth
+            if tag == "a":
+                if self.in_svg:
+                    self.svg_hrefs.append(a.get("href") or "")
+                if self.in_list:
+                    self.list_hrefs.append(a.get("href") or "")
+        elif a.get("id") == "map":
+            self.seen += 1
+            self.depth = 1
+
+    def handle_endtag(self, tag):
+        if self.depth and tag not in VOID:
+            if self.in_svg == self.depth:
+                self.in_svg = 0
+            if self.in_list == self.depth:
+                self.in_list = 0
+            self.depth -= 1
+
+
+def check_map(site):
+    w = MapWalker()
+    w.feed(site.pages.get("index.html", ""))
+    w.close()
+    if w.seen != 1:
+        return [f"index.html: expected one #map section, found {w.seen}"]
+    problems = []
+    if w.svgs != 1:
+        problems.append(f"index.html: #map has {w.svgs} <svg>, expected 1")
+    if w.lists != 1:
+        problems.append(f"index.html: #map has {w.lists} .net-map-list, expected 1")
+    problems += [f"index.html: #map svg link '{h}' has no matching link in .net-map-list"
+                 for h in w.svg_hrefs if h not in w.list_hrefs]
+    problems += [f"index.html: #map list link '{h}' has no matching link in the svg"
+                 for h in w.list_hrefs if h not in w.svg_hrefs]
+    if len(w.list_hrefs) > 12:
+        problems.append(f"index.html: #map has {len(w.list_hrefs)} devices, at most 12")
+    if not w.list_hrefs:
+        problems.append("index.html: #map has no devices")
+    return problems
+
+
 CHECKS = [check_balanced, check_links, check_no_empty_links,
           check_nav, check_fast_lane, check_titles, check_case_files,
-          check_severity, check_terminal_fallback, check_window_classes, check_mission]
+          check_severity, check_terminal_fallback, check_window_classes, check_mission, check_map]
 
 
 def main(argv):

@@ -480,3 +480,37 @@ a:focus-visible, .btn:focus-visible {
 @media (min-width: 700px) {
     .timeline .when, .timeline .pin-label { display: inline-block; min-width: 14rem; }
 }
+
+/* Network map: SVG from 700px, plain list below (the hidden one is display:none) */
+.net-map { margin: 0 0 3rem; }
+.net-map h2 { margin: 0 0 0.5rem; }
+.net-map-intro { color: var(--muted); margin: 0 0 1rem; }
+.net-map svg { display: none; width: 100%; height: auto; font-family: var(--mono); font-size: 12px; }
+.net-map-list, .net-map-list ul { list-style: none; margin: 0; padding: 0; }
+.net-map-list > li {
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+}
+.net-map-list .sw-name { display: block; color: var(--accent); font-family: var(--mono); font-weight: 600; margin-bottom: 0.25rem; }
+.net-map-list li li { padding: 0.15rem 0; }
+.net-map .links path { fill: none; stroke: var(--border); stroke-width: 2; }
+.net-map .node rect { fill: var(--surface); stroke-width: 2; }
+.net-map .node text { fill: var(--text); font-weight: 600; }
+.net-map .router rect { stroke: var(--pink); }
+.net-map .switch rect { stroke: var(--accent); }
+.net-map .device rect { fill: var(--surface); stroke-width: 2; }
+.net-map .device.proj rect { stroke: var(--green); }
+.net-map .device.cred rect { stroke: var(--yellow); }
+.net-map .device text { fill: var(--text); }
+.net-map .device .tip { fill: var(--muted); opacity: 0; }
+.net-map .device:hover .tip, .net-map .device:focus .tip, .net-map .device:focus-visible .tip { opacity: 1; }
+.net-map .device:hover rect { fill: var(--surface-2); }
+.net-map .device:focus-visible { outline: none; }
+.net-map .device:focus-visible rect { stroke: var(--text); stroke-width: 3; }
+@media (min-width: 700px) {
+    .net-map svg { display: block; }
+    .net-map-list { display: none; }
+}
