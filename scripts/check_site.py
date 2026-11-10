@@ -351,9 +351,49 @@ def check_window_classes(site):
     return problems
 
 
+class MissionWalker(HTMLParser):
+    """Counts <li> items and collects the text inside #mission."""
+
+    def __init__(self):
+        super().__init__()
+        self.depth, self.seen, self.items, self.text = 0, 0, 0, ""
+
+    def handle_starttag(self, tag, attrs):
+        if self.depth:
+            if tag not in VOID:
+                self.depth += 1
+            self.items += tag == "li"
+        elif dict(attrs).get("id") == "mission":
+            self.seen += 1
+            self.depth = 1
+
+    def handle_endtag(self, tag):
+        if self.depth and tag not in VOID:
+            self.depth -= 1
+
+    def handle_data(self, data):
+        if self.depth:
+            self.text += data
+
+
+def check_mission(site):
+    w = MissionWalker()
+    w.feed(site.pages.get("index.html", ""))
+    w.close()
+    if w.seen != 1:
+        return [f"index.html: expected one #mission section, found {w.seen}"]
+    problems = []
+    if w.items < 6:
+        problems.append(f"index.html: #mission has {w.items} <li> items, expected at least 6")
+    problems += [f"index.html: #mission is missing '{n}'"
+                 for n in ("Hurlburt Field", "Kirtland AFB", "Creating Coding Careers", "Next")
+                 if n not in w.text]
+    return problems
+
+
 CHECKS = [check_balanced, check_links, check_no_empty_links,
           check_nav, check_fast_lane, check_titles, check_case_files,
-          check_severity, check_terminal_fallback, check_window_classes]
+          check_severity, check_terminal_fallback, check_window_classes, check_mission]
 
 
 def main(argv):

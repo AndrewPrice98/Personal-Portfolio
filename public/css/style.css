@@ -448,3 +448,36 @@ a:focus-visible, .btn:focus-visible {
 .case-links li { margin: 0; }
 .case-links a.btn { margin: 0; }
 .case-file a:focus-visible, .case-file .btn:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
+
+/* Mission log timeline */
+.mission-log { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+.mission-log h2 { margin: 0 0 1rem; }
+.timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 1.5rem;
+    border-left: 2px solid var(--purple);
+}
+.timeline li { position: relative; margin: 0 0 1.1rem; overflow-wrap: anywhere; }
+.timeline li:last-child { margin-bottom: 0; }
+.timeline li::before {
+    content: '';
+    position: absolute;
+    left: calc(-1.5rem - 6px);
+    top: 0.45em;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--pink);
+}
+.timeline time, .timeline .pin-label {
+    display: block;
+    color: var(--yellow);
+    font-family: var(--mono);
+    font-weight: 600;
+}
+.timeline .pinned::before { background: var(--green); }
+.timeline .next::before { background: var(--bg); border: 2px solid var(--green); }
+@media (min-width: 700px) {
+    .timeline time, .timeline .pin-label { display: inline-block; min-width: 11rem; }
+}
