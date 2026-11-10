@@ -4,6 +4,7 @@ Exits 0 when clean, otherwise 1 with one line per problem: "<file>: <problem>".
 Standard library only. Add a check by writing check_x(site) -> list[str]
 and appending it to CHECKS.
 """
+import re
 import sys
 from html.parser import HTMLParser
 from pathlib import Path
@@ -357,12 +358,15 @@ class MissionWalker(HTMLParser):
     def __init__(self):
         super().__init__()
         self.depth, self.seen, self.items, self.text = 0, 0, 0, ""
+        self.datetimes = []
 
     def handle_starttag(self, tag, attrs):
         if self.depth:
             if tag not in VOID:
                 self.depth += 1
             self.items += tag == "li"
+            if tag == "time":
+                self.datetimes.append(dict(attrs).get("datetime") or "")
         elif dict(attrs).get("id") == "mission":
             self.seen += 1
             self.depth = 1
@@ -388,6 +392,8 @@ def check_mission(site):
     problems += [f"index.html: #mission is missing '{n}'"
                  for n in ("Hurlburt Field", "Kirtland AFB", "Creating Coding Careers", "Next")
                  if n not in w.text]
+    problems += [f"index.html: #mission <time datetime=\"{d}\"> is not YYYY, YYYY-MM or YYYY-MM-DD"
+                 for d in w.datetimes if not re.fullmatch(r"\d{4}(-\d{2}(-\d{2})?)?", d)]
     return problems
 
 

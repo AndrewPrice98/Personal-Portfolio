@@ -286,7 +286,6 @@ h3 { font-size: 1.15rem; margin: 0 0 0.5rem; color: var(--yellow); }
 @media (pointer: coarse), (max-width: 560px) {
     .term-chips a { min-height: 44px; }
 }
-.mission { margin: 0 0 4rem; }
 
 /* Footer: editor status bar */
 .status-bar {
@@ -450,7 +449,7 @@ a:focus-visible, .btn:focus-visible {
 .case-file a:focus-visible, .case-file .btn:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
 
 /* Mission log timeline */
-.mission-log { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+.mission-log { margin: 0 0 3rem; }
 .mission-log h2 { margin: 0 0 1rem; }
 .timeline {
     list-style: none;
@@ -470,7 +469,7 @@ a:focus-visible, .btn:focus-visible {
     border-radius: 50%;
     background: var(--pink);
 }
-.timeline time, .timeline .pin-label {
+.timeline .when, .timeline .pin-label {
     display: block;
     color: var(--yellow);
     font-family: var(--mono);
@@ -479,5 +478,5 @@ a:focus-visible, .btn:focus-visible {
 .timeline .pinned::before { background: var(--green); }
 .timeline .next::before { background: var(--bg); border: 2px solid var(--green); }
 @media (min-width: 700px) {
-    .timeline time, .timeline .pin-label { display: inline-block; min-width: 11rem; }
+    .timeline .when, .timeline .pin-label { display: inline-block; min-width: 14rem; }
 }
