@@ -24,4 +24,4 @@ To preview, open `public/index.html` in a browser.
 
 ## Deploy
 
-Hosted on Render as a static site using [`render.yaml`](render.yaml), which publishes the `public/` folder. Pushing to `main` redeploys it.
+GitHub Pages publishes `public/` on every push to `main` (workflow `.github/workflows/pages.yml`).
