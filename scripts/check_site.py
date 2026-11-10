@@ -471,9 +471,97 @@ def check_map(site):
     return problems
 
 
+QUEUE_FEATURED = {"NetGuard": "projects/netguard.html", "LogIngestLLM": "projects/logingestllm.html",
+                  "CySA+ Study": "projects/cysa-study.html", "CCNA Study": "projects/ccna-study.html",
+                  "Job Tracker": "projects/job-tracker.html",
+                  "Military Flight Tracker": "projects/flight-tracker.html",
+                  "Tempered": "projects/tempered.html", "Sudo-Snake": "projects/sudo-snake.html"}
+QUEUE_COURSEWORK = {"Card Scanner": "https://github.com/AndrewPrice98/Card-Scanner",
+                    "Movie Finder": "https://github.com/AndrewPrice98/node101-movie-finder",
+                    "Tic Tac Toe": "https://github.com/AndrewPrice98/React100-TicTacToe",
+                    "San Diego Top Spots": "https://github.com/AndrewPrice98/SanDiegoTopSpots",
+                    "Mortgage Calculator": "https://github.com/AndrewPrice98/React100MortgageCalc"}
+QUEUE_SEVERITIES = {"crit", "high", "med", "info"}
+
+
+class QueueWalker(HTMLParser):
+    """Collects each li.alert-row inside an .alert-queue: its attributes, first link and title."""
+
+    def __init__(self):
+        super().__init__()
+        self.queues, self.rows = 0, []
+        self.in_row, self.in_title, self.depth = False, False, 0
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        cls = (a.get("class") or "").split()
+        if "alert-queue" in cls:
+            self.queues += 1
+        if tag == "li" and "alert-row" in cls:
+            self.in_row, self.depth = True, 1
+            self.rows.append({"sev": a.get("data-severity"), "cat": a.get("data-category"),
+                              "href": None, "title": ""})
+            return
+        if not self.in_row:
+            return
+        if tag not in VOID:
+            self.depth += 1
+        if tag == "a" and self.rows[-1]["href"] is None:
+            self.rows[-1]["href"] = a.get("href") or ""
+        if "row-title" in cls:
+            self.in_title = True
+
+    def handle_endtag(self, tag):
+        if self.in_row and tag not in VOID:
+            self.depth -= 1
+            self.in_title = False
+            if self.depth == 0:
+                self.in_row = False
+
+    def handle_data(self, data):
+        if self.in_title:
+            self.rows[-1]["title"] += data
+
+
+def check_queue(site):
+    problems = []
+    for name in ("index.html", "portfolio.html"):
+        w = QueueWalker()
+        w.feed(site.pages.get(name, ""))
+        w.close()
+        if w.queues != 1:
+            problems.append(f"{name}: expected one .alert-queue, found {w.queues}")
+            continue
+        titles = {}
+        for r in w.rows:
+            r["title"] = " ".join(r["title"].split())
+            titles[r["title"]] = r
+            if r["sev"] not in QUEUE_SEVERITIES:
+                problems.append(f"{name}: queue row '{r['title']}' has data-severity '{r['sev']}'")
+            if not r["href"]:
+                problems.append(f"{name}: queue row '{r['title']}' has no link")
+        if len(titles) != len(w.rows):
+            problems.append(f"{name}: queue has duplicate row titles")
+        want = set(QUEUE_FEATURED) | (set(QUEUE_COURSEWORK) if name == "portfolio.html" else set())
+        if set(titles) != want:
+            problems.append(f"{name}: queue rows differ: missing {sorted(want - set(titles))}, unexpected {sorted(set(titles) - want)}")
+        for t, href in QUEUE_FEATURED.items():
+            if t in titles and titles[t]["href"] != href:
+                problems.append(f"{name}: queue row '{t}' links to '{titles[t]['href']}', expected {href}")
+        for t, href in QUEUE_COURSEWORK.items():
+            if name == "portfolio.html" and t in titles:
+                if titles[t]["sev"] != "info":
+                    problems.append(f"{name}: queue row '{t}' is not info")
+                if titles[t]["href"] != href:
+                    problems.append(f"{name}: queue row '{t}' links to '{titles[t]['href']}', expected {href}")
+        if name == "index.html" and 'class="queue-filters"' not in site.pages[name]:
+            problems.append("index.html: no .queue-filters")
+    return problems
+
+
 CHECKS = [check_balanced, check_links, check_no_empty_links,
           check_nav, check_fast_lane, check_titles, check_case_files,
-          check_severity, check_terminal_fallback, check_window_classes, check_mission, check_map]
+          check_severity, check_terminal_fallback, check_window_classes, check_mission, check_map, check_queue]
 
 
 def main(argv):
