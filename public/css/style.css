@@ -317,6 +317,7 @@ h3 { font-size: 1.15rem; margin: 0 0 0.5rem; color: var(--yellow); }
 
 @media (prefers-reduced-motion: reduce) {
     .brand::after { animation: none; }
+    * { transition: none !important; }
 }
 
 /* Resume page: the PDF shown in a window frame */
@@ -352,7 +353,7 @@ h3 { font-size: 1.15rem; margin: 0 0 0.5rem; color: var(--yellow); }
     color: var(--green);
     font-weight: 600;
 }
-.badge-open::before { content: '\25CF\00a0'; }
+.badge-open::before { content: '\25CF\00a0'; content: '\25CF\00a0' / ''; }
 @media (min-width: 700px) {
     .fast-lane { position: sticky; top: 0; z-index: 10; }
 }

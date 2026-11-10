@@ -534,7 +534,7 @@ def check_queue(site):
             continue
         titles = {}
         for r in w.rows:
-            r["title"] = " ".join(r["title"].split())
+            r["title"] = " ".join(r["title"].replace("↗", "").replace("(opens GitHub in a new tab)", "").split())
             titles[r["title"]] = r
             if r["sev"] not in QUEUE_SEVERITIES:
                 problems.append(f"{name}: queue row '{r['title']}' has data-severity '{r['sev']}'")
@@ -554,6 +554,19 @@ def check_queue(site):
                     problems.append(f"{name}: queue row '{t}' is not info")
                 if titles[t]["href"] != href:
                     problems.append(f"{name}: queue row '{t}' links to '{titles[t]['href']}', expected {href}")
+        html = site.pages[name]
+        if 'class="alert-queue" role="list"' not in html:
+            problems.append(f"{name}: .alert-queue must be <ul role=\"list\">")
+        if 'id="queue-status"' not in html:
+            problems.append(f"{name}: no #queue-status live region")
+        for tag, a in walk(html).tags:
+            if tag == "a" and "aria-labelledby" in a and a.get("aria-labelledby", "").startswith("rt-"):
+                for attr, pre in (("aria-labelledby", "rt-"), ("aria-describedby", "rs-")):
+                    ref = a.get(attr, "")
+                    if not ref.startswith(pre) or f'id="{ref}"' not in html:
+                        problems.append(f"{name}: queue link {a.get('href')} {attr}='{ref}' has no matching id")
+        if name == "portfolio.html" and html.count("(opens GitHub in a new tab)") != len(QUEUE_COURSEWORK):
+            problems.append(f"{name}: coursework rows need an '(opens GitHub in a new tab)' hint")
         if name == "index.html" and 'class="queue-filters"' not in site.pages[name]:
             problems.append("index.html: no .queue-filters")
     return problems
