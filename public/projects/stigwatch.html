@@ -78,7 +78,7 @@
 </tbody>
 </table></div>
 <figure class="case-figure">
-<img src="../images/cases/stigwatch-drift.webp" alt="STIGWatch Drift page for the demo fleet: four CAT I regression alerts in week 6, such as WN22-SO-000210 on file-01 going from Not a finding to Open, above a fleet timeline of eight weekly scans" width="1200" height="771" loading="lazy">
+<img src="../images/cases/stigwatch-drift.webp" alt="STIGWatch Drift page for the demo fleet: four CAT I regression alerts in week 6, such as WN22-SO-000210 on file-01 going from Not a finding to Open, above a fleet timeline of eight weekly scans" width="1200" height="857" loading="lazy">
 <figcaption>The Drift page: four CAT I regressions in week 6 of the demo fleet, each linked to its host, above the weekly timeline of open findings by category.</figcaption>
 </figure>
             </section>
@@ -87,11 +87,11 @@
 <p>The demo is a fictional fleet of 14 invented hosts with 8 weekly scans each (112 scans). It is built so that week 6 contains four CAT I regressions across two hosts, and the Fleet page opens on them.</p>
 <p>336 backend tests are collected (332 passed and 4 platform-specific skips, with pytest), alongside 29 frontend unit tests and a small Playwright smoke test that checks guests are read-only and that a rule that lost visibility is never shown as fixed. CI runs the backend tests, the benchmark, coverage and demo checks, the frontend tests and build, the smoke test, <code>pip-audit</code>, <code>npm audit</code> and a gitleaks scan. It also runs the real collectors: the Ubuntu one on an <code>ubuntu-22.04</code> runner, and the Windows one on <code>windows-2022</code> under both PowerShell 7 and Windows PowerShell 5.1. Generated playbooks go through <code>ansible-playbook --syntax-check</code> and <code>ansible-lint</code>, and generated scripts through the PowerShell parser and a dry run.</p>
 <figure class="case-figure">
-<img src="../images/cases/stigwatch-fleet.webp" alt="STIGWatch Fleet overview for 14 hosts and 112 scans: a start-here panel reporting that 4 CAT I rules regressed on file-01 and web-01 in week 6, with the affected rules and their latest status" width="1200" height="771" loading="lazy">
+<img src="../images/cases/stigwatch-fleet.webp" alt="STIGWatch Fleet overview for 14 hosts and 112 scans: a panel reporting that 4 CAT I rules regressed on file-01 and web-01 in week 6, with the affected rules and their latest status" width="1200" height="857" loading="lazy">
 <figcaption>The Fleet page opens on what needs attention: the week 6 regressions, which are still open and which closed again.</figcaption>
 </figure>
 <figure class="case-figure">
-<img src="../images/cases/stigwatch-remediation.webp" alt="STIGWatch Remediation page for host bkp-01: a warning to review before applying and test on a non-production host, above a generated PowerShell script that is a dry run unless -Apply is given" width="1200" height="771" loading="lazy">
+<img src="../images/cases/stigwatch-remediation.webp" alt="STIGWatch Remediation page for host bkp-01: a warning to review before applying and test on a non-production host, above a generated PowerShell script that is a dry run unless -Apply is given" width="1200" height="857" loading="lazy">
 <figcaption>Generated remediation for one host: a review warning first, then a script that does nothing unless it is run with <code>-Apply</code>.</figcaption>
 </figure>
             </section>

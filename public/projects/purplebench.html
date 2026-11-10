@@ -80,7 +80,7 @@
 </tbody>
 </table></div>
 <figure class="case-figure">
-<img src="../images/cases/purplebench-coverage.webp" alt="PurpleBench ATT&amp;CK coverage page for run 4, the ransomware precursors campaign: 85.7 percent, 12 of 14 tested techniques detected, laid out by ATT&amp;CK v20 tactic with a change-since-run-2 table showing three improved techniques" width="1200" height="1545" loading="lazy">
+<img src="../images/cases/purplebench-coverage.webp" alt="PurpleBench ATT&amp;CK coverage page for run 4, the ransomware precursors campaign: 85.7 percent, 12 of 14 tested techniques detected, laid out by ATT&amp;CK v20 tactic with a change-since-run-2 table showing three improved techniques" width="1200" height="1371" loading="lazy">
 <figcaption>Run 4 against the ATT&amp;CK v20 tactics, and what changed since run 2: 64.3% to 85.7%, three techniques improved, none regressed.</figcaption>
 </figure>
             </section>
@@ -90,11 +90,11 @@
 <p>The telemetry is Splunk attack_data (Apache-2.0) covering 26 techniques over 11 tactics, trimmed to each test window, plus a benign baseline. One technique, Kerberoasting (T1558.003), is untested because the trimmed file has no Kerberoasting events.</p>
 <p>693 backend tests pass (pytest), alongside 47 frontend unit tests and a production build. The lab runner's static safety check has a self-test of 209 cases (the unchanged runner, 154 appended bypass attempts, 15 inside the remote script blocks, 38 weakened gates and a fixture file) that proves the checker fails on each. CI also runs <code>pip-audit</code>, <code>npm audit</code>, gitleaks and the data checks that keep the catalog, the coverage document and the demo fixture current.</p>
 <figure class="case-figure">
-<img src="../images/cases/purplebench-gaps.webp" alt="PurpleBench detection gaps page: 19 gaps with 12 open and 7 closed, each missed technique such as T1059.001 PowerShell and T1548.002 Bypass User Account Control shown with the telemetry needed and a rule idea" width="1200" height="1382" loading="lazy">
+<img src="../images/cases/purplebench-gaps.webp" alt="PurpleBench detection gaps page: 19 gaps with 12 open and 7 closed, each missed technique such as T1059.001 PowerShell and T1548.002 Bypass User Account Control shown with the telemetry needed and a rule idea" width="1200" height="1400" loading="lazy">
 <figcaption>The gap list: each miss with the telemetry that would be needed, a rule idea, and the run that closed it, if one did.</figcaption>
 </figure>
 <figure class="case-figure">
-<img src="../images/cases/purplebench-rule.webp" alt="PurpleBench rule page for a custom rule, LSASS Opened By A Process Running From A User-Writable Folder, showing its author, ATT&amp;CK technique T1003.001, the runs where it fired and the Sigma YAML the evaluator read" width="1200" height="1269" loading="lazy">
+<img src="../images/cases/purplebench-rule.webp" alt="PurpleBench rule page for a custom rule, LSASS Opened By A Process Running From A User-Writable Folder, showing its author, ATT&amp;CK technique T1003.001, the runs where it fired and the Sigma YAML the evaluator read" width="1200" height="1217" loading="lazy">
 <figcaption>A custom rule with its author, the run where it fired and the exact YAML the evaluator read.</figcaption>
 </figure>
             </section>

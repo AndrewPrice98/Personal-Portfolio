@@ -80,7 +80,7 @@
 </tbody>
 </table></div>
 <figure class="case-figure">
-<img src="../images/cases/cmmc-ready-requirement-detail.webp" alt="CMMC Ready requirement page for AC.L2-3.1.10 session lock: the assessor answered Met, the Windows collector found a 3600-second timeout on host FS-01, and both values are shown in a Conflicts with evidence panel with the observed and expected settings" width="1200" height="1174" loading="lazy">
+<img src="../images/cases/cmmc-ready-requirement-detail.webp" alt="CMMC Ready requirement page for AC.L2-3.1.10 session lock: the assessor answered Met, the Windows collector found a 3600-second timeout on host FS-01, and both values are shown in a Conflicts with evidence panel with the observed and expected settings" width="1200" height="1200" loading="lazy">
 <figcaption>A conflict on 3.1.10: the assessor says Met, one file server's collector output says Not met, and both are shown. The assessor's answer still decides the score.</figcaption>
 </figure>
             </section>
@@ -89,7 +89,7 @@
 <p>The demo loads a fictional contractor with two assessments: a provisional score of 41 in June 2026, then 86 in the autumn, two points short of conditional status, with 3.5.3 and 3.8.8 blocking it because neither may go on a POA&amp;M.</p>
 <p>401 tests (369 backend with pytest, 32 frontend with node:test) cover the catalog against the published counts and weights, every scoring rule including the six requirements barred from a POA&amp;M, both collectors against compliant, non-compliant and unreadable synthetic output, conflicts, the exports and their disclaimer, every API endpoint, guest mode on every write route, SQL injection payloads on every parameter, upload validation and authentication. CI runs the tests, the catalog and coverage checks, the frontend tests and build, <code>pip-audit</code>, <code>npm audit</code> and a gitleaks scan, and runs the Windows collector for real on GitHub's <code>windows-latest</code> runner under both PowerShell 7 and Windows PowerShell 5.1, then parses its output.</p>
 <figure class="case-figure">
-<img src="../images/cases/cmmc-ready-overview.webp" alt="CMMC Ready overview for a fictional contractor: SPRS score 86 of 110 on a gauge from minus 203 to 110, two points short of the conditional status threshold of 88, the biggest gap IA.L2-3.5.3, five conflicts with evidence, a family heatmap of met and not met requirements, and the gaps that would raise the score most" width="1200" height="1556" loading="lazy">
+<img src="../images/cases/cmmc-ready-overview.webp" alt="CMMC Ready overview for a fictional contractor: SPRS score 86 of 110 on a meter from minus 203 to 110 with a tick at the threshold, two points short of the conditional status threshold of 88, the biggest gap IA.L2-3.5.3, five conflicts with evidence, a family heatmap of met and not met requirements, and the gaps that would raise the score most" width="1200" height="1041" loading="lazy">
 <figcaption>The overview: the SPRS score against the 88-point threshold, what blocks conditional status, the family heatmap and the gaps that move the score most.</figcaption>
 </figure>
 <figure class="case-figure">
