@@ -105,6 +105,7 @@ class TextWalker(HTMLParser):
         self.nav_depth = 0
         self.nav_links, self._link = [], None
         self.in_title, self.title = False, ""
+        self.in_head = False
         self.fl_depth, self.fl_text, self.fl_classes = 0, "", []
         self.fl_seen = False
 
@@ -115,7 +116,9 @@ class TextWalker(HTMLParser):
             self.nav_depth += 1
         if tag == "a" and self.nav_depth:
             self._link = ""
-        if tag == "title":
+        if tag == "head":
+            self.in_head = True
+        if tag == "title" and self.in_head:
             self.in_title = True
         if self.fl_depth and tag not in VOID:
             self.fl_depth += 1
@@ -130,6 +133,8 @@ class TextWalker(HTMLParser):
         if tag == "a" and self._link is not None:
             self.nav_links.append(" ".join(self._link.split()))
             self._link = None
+        if tag == "head":
+            self.in_head = False
         if tag == "title":
             self.in_title = False
         if self.fl_depth and tag not in VOID:
@@ -405,6 +410,7 @@ class MapWalker(HTMLParser):
         self.depth, self.seen, self.svgs, self.lists = 0, 0, 0, 0
         self.in_svg, self.in_list = 0, 0
         self.svg_hrefs, self.list_hrefs = [], []
+        self.unlabelled, self.svg_labelled = 0, False
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
@@ -413,6 +419,7 @@ class MapWalker(HTMLParser):
                 self.depth += 1
             if tag == "svg":
                 self.svgs += 1
+                self.svg_labelled = bool((a.get("aria-labelledby") or "").strip() or (a.get("aria-label") or "").strip())
                 self.in_svg = self.depth
             if tag == "ul" and "net-map-list" in (a.get("class") or "").split():
                 self.lists += 1
@@ -420,6 +427,7 @@ class MapWalker(HTMLParser):
             if tag == "a":
                 if self.in_svg:
                     self.svg_hrefs.append(a.get("href") or "")
+                    self.unlabelled += not (a.get("aria-label") or "").strip()
                 if self.in_list:
                     self.list_hrefs.append(a.get("href") or "")
         elif a.get("id") == "map":
@@ -450,6 +458,12 @@ def check_map(site):
                  for h in w.svg_hrefs if h not in w.list_hrefs]
     problems += [f"index.html: #map list link '{h}' has no matching link in the svg"
                  for h in w.list_hrefs if h not in w.svg_hrefs]
+    if not w.svg_labelled:
+        problems.append("index.html: #map svg has no accessible name (aria-labelledby or aria-label)")
+    if w.unlabelled:
+        problems.append(f"index.html: #map has {w.unlabelled} svg link(s) without a non-empty aria-label")
+    if len(w.svg_hrefs) != len(w.list_hrefs):
+        problems.append(f"index.html: #map has {len(w.svg_hrefs)} svg links but {len(w.list_hrefs)} list links")
     if len(w.list_hrefs) > 12:
         problems.append(f"index.html: #map has {len(w.list_hrefs)} devices, at most 12")
     if not w.list_hrefs:
