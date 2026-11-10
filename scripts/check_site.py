@@ -339,9 +339,21 @@ def check_terminal_fallback(site):
     return problems
 
 
+def check_window_classes(site):
+    css_path = site.root / "css" / "style.css"
+    css = css_path.read_text(encoding="utf-8") if css_path.exists() else ""
+    problems = []
+    for name, html in site.pages.items():
+        used = {c for _, a in walk(html).tags for c in (a.get("class") or "").split()
+                if c.startswith(("window", "code-"))}
+        problems += [f"{name}: class '{c}' has no rule in css/style.css"
+                     for c in sorted(used) if f".{c}" not in css]
+    return problems
+
+
 CHECKS = [check_balanced, check_links, check_no_empty_links,
           check_nav, check_fast_lane, check_titles, check_case_files,
-          check_severity, check_terminal_fallback]
+          check_severity, check_terminal_fallback, check_window_classes]
 
 
 def main(argv):

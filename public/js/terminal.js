@@ -102,7 +102,6 @@
     function renderLines(lines) {
         var pre = document.createElement('pre');
         pre.className = 'term-output';
-        pre.setAttribute('aria-hidden', 'true');
         lines.forEach(function (l, i) {
             if (i) pre.appendChild(document.createTextNode('\n'));
             if (typeof l === 'string') { pre.appendChild(document.createTextNode(l)); return; }
@@ -139,13 +138,21 @@
         history.appendChild(p);
     }
 
+    function hasLinks(lines) {
+        return lines.some(function (l) { return typeof l !== 'string' && l.some(function (seg) { return typeof seg !== 'string'; }); });
+    }
+
+    // The visible output is real, reachable text (links included), so it is never
+    // aria-hidden. The live region carries the complete text when there are no links;
+    // for results with links it announces a short summary so each link is reached once, in place.
     function output(lines) {
         history.appendChild(renderLines(lines));
-        announce(plain(lines));
+        announce(hasLinks(lines) ? 'Output printed below the prompt, with links.' : plain(lines));
     }
 
     var past = [];
     var pos = 0;
+    var draft = '';
     var input;
 
     function run(raw) {
@@ -199,10 +206,11 @@
             pool = Object.keys(COMMANDS).concat(['open', 'sudo hire andrew']);
         }
         var hits = pool.filter(function (c) { return c.indexOf(prefix) === 0; });
-        if (!hits.length) return true;
+        if (!hits.length) return false;
         var common = hits[0];
         hits.forEach(function (h) { while (h.indexOf(common) !== 0) common = common.slice(0, -1); });
         if (hits.length === 1 && common === 'open') common = 'open ';
+        if (head + common === input.value.replace(/^\s+/, '') && hits.length === 1) return false;
         input.value = head + common;
         if (hits.length > 1 && common === prefix) {
             echo(head + prefix);
@@ -239,28 +247,28 @@
         input.addEventListener('keydown', function (e) {
             if (e.key === 'ArrowUp') {
                 e.preventDefault();
-                if (pos > 0) input.value = past[--pos];
+                if (pos > 0) { if (pos === past.length) draft = input.value; input.value = past[--pos]; }
             } else if (e.key === 'ArrowDown') {
                 e.preventDefault();
                 if (pos < past.length - 1) input.value = past[++pos];
-                else { pos = past.length; input.value = ''; }
+                else if (pos < past.length) { pos = past.length; input.value = draft; }
             } else if (e.key === 'Tab' && !e.shiftKey && input.value.trim()) {
                 if (complete()) e.preventDefault();
             }
         });
         root.addEventListener('click', function (e) {
-            if (e.target.closest('a, button, input')) return;
+            if (e.target.closest('a, button, input, .term-chips')) return;
             if (window.getSelection && String(window.getSelection())) return;
+            // On touch screens only the prompt line focuses the input, so a stray tap does not raise the keyboard.
+            if (window.matchMedia('(pointer: coarse)').matches && !e.target.closest('.term-input-line')) return;
             input.focus();
         });
     }
 
     function init() {
         buildPrompt();
-        // The static block becomes decorative; the live region carries the text once.
-        staticOut.setAttribute('aria-hidden', 'true');
+        // The static result stays readable in place; only the echoed prompt line is decorative.
         staticLine.setAttribute('aria-hidden', 'true');
-        var announced = plain(COMMANDS.whoami());
 
         chips.forEach(function (chip) {
             chip.addEventListener('click', function (e) {
@@ -270,10 +278,7 @@
             });
         });
 
-        if (reduceMotion) {
-            announce(announced);
-            return;
-        }
+        if (reduceMotion) return;
         // Type "whoami" once, then reveal the result.
         var cmdEl = staticLine.querySelector('.term-cmd');
         var word = cmdEl.textContent;
@@ -285,7 +290,6 @@
             if (i < word.length) { setTimeout(tick, 70 + Math.random() * 60); return; }
             setTimeout(function () {
                 staticOut.style.visibility = '';
-                announce(announced);
             }, 250);
         })();
     }
