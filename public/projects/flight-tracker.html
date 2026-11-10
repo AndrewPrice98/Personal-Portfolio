@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Military Flight Tracker case file | Andrew T. Price II</title>
+    <meta name="description" content="Military Flight Tracker: a live map of military aircraft from ADS-B data, built at a React hackathon.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container nav">
+            <a class="brand" href="../index.html"><span>Andrew T. Price II</span></a>
+            <nav aria-label="Main">
+                <a href="../index.html">Home</a>
+                <a href="../portfolio.html" aria-current="page">Projects</a>
+                <a href="../resume.html">Resume</a>
+                <a href="../contact.html">Contact</a>
+            </nav>
+        </div>
+    </header>
+    <aside class="fast-lane" aria-label="At a glance">
+        <div class="container fast-lane-inner">
+            <p class="fast-lane-facts">Active DoD Secret clearance &middot; CompTIA Security+ (IAT II) &middot; 5+ yrs USAF avionics &middot; Full-stack developer</p>
+            <div class="fast-lane-actions">
+                <span class="badge-open">open to work</span>
+                <a class="fl-resume" href="../resume.html">Resume</a>
+                <a class="fl-linkedin" href="https://www.linkedin.com/in/andrew-price98" target="_blank" rel="noopener">LinkedIn</a>
+                <a class="fl-contact" href="../contact.html">Contact</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="container">
+        <article class="case-file">
+            <p class="case-back"><a href="../portfolio.html">&larr; All projects</a></p>
+            <h1>Military Flight Tracker</h1>
+            <p class="case-meta"><span class="sev sev-medium">Priority: Medium</span> <span>Web development, open-source intelligence</span> <span>React, Leaflet, axios, ADS-B and NASA EONET APIs</span></p>
+            <section class="case-section">
+<h2>Summary</h2>
+<p>Military Flight Tracker is a live map of military aircraft built at a React hackathon. It polls ADS-B data every 10 seconds, draws flight trails, raises alerts for emergency squawks and notable airframes, and overlays NASA natural events and conflict zones.</p>
+            </section>
+            <section class="case-section">
+<h2>Problem</h2>
+<p>ADS-B data is public, but a raw list of aircraft is just rows. I wanted it to read the way an analyst would: what is flying right now, which aircraft are worth a second look, and what is happening on the ground near them. The work was choosing signals worth surfacing and wiring several public sources together on one map.</p>
+            </section>
+            <section class="case-section">
+<h2>What I built</h2>
+<ul>
+<li><strong>A live map</strong> of aircraft from <code>api.adsb.lol/v2/mil</code>, refreshed every 10 seconds, with a flight trail per aircraft.</li>
+<li><strong>Alert watch.</strong> Emergency squawks 7500 (hijack), 7600 (radio failure) and 7700 (general emergency) sort to the top. A watch list of 12 ICAO type codes flags notable airframes, such as the E-4 airborne command post, the B-2 stealth bomber, the E-6 nuclear command relay and the U-2.</li>
+<li><strong>A squawk reference</strong> that decodes special codes and military blocks.</li>
+<li><strong>Aircraft detail.</strong> A dataset of 129 U.S. military aircraft with photos, matched by ICAO type code with an alias table, and the country inferred from the ICAO hex range.</li>
+<li><strong>Position source.</strong> Each aircraft is labelled by how its position is known (ADS-B broadcast, or tracked without self-reported position, like MLAT and TIS-B).</li>
+<li><strong>Context layers.</strong> NASA EONET natural events (open events from the last 10 days, refreshed every 10 minutes) and 15 hand-written conflict zones, each a circle with a start year and a note.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>How it works</h2>
+<ul>
+<li>A <code>useMilitaryFeed</code> hook polls the endpoint on an interval and keeps the last 8 positions per aircraft, keyed by hex code. A point is only added when the aircraft actually moved, and aircraft without a position are skipped.</li>
+<li><code>findAlerts</code> checks each aircraft's squawk against the emergency codes first, then its type against the watch list.</li>
+<li><strong>The CORS wall.</strong> adsb.lol sends no CORS headers, so a browser refuses to read its responses. In development the Vite dev server proxies <code>/api/adb</code> to it instead.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>Evidence</h2>
+<ul>
+<li>It was built at the hackathon. The repository holds the full source, including a written walkthrough of importing an API into a React app, using this feed as the worked example.</li>
+<li>No screenshot or live link: the app depends on the dev-server proxy above, so there is no deployed copy to point at.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>What I'd do next</h2>
+<ul>
+<li><strong>A real proxy.</strong> The CORS workaround exists only in <code>npm run dev</code>. A small serverless function would let it deploy.</li>
+<li><strong>Longer trails.</strong> Eight positions is about 80 seconds of history at a 10-second poll, if the aircraft moves on every update.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>Links</h2>
+<ul class="case-links">
+<li><a class="btn btn-small" href="https://github.com/AndrewPrice98/React100_Hackathon" target="_blank" rel="noopener">Code on GitHub</a></li>
+<li><a class="btn btn-small btn-ghost" href="../portfolio.html">Back to all projects</a></li>
+</ul>
+            </section>
+        </article>
+    </main>
+
+    <footer class="site-footer status-bar">
+        <div class="status-left">
+            <span class="status-branch">&#x2387; main</span>
+            <span class="status-ok">&#x2713; 0 errors</span>
+            <span>&copy; 2026 Andrew T. Price II</span>
+        </div>
+        <div class="status-right">
+            <span class="status-extra">UTF-8</span>
+            <span class="status-extra">HTML</span>
+            <a href="https://github.com/AndrewPrice98" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+
+    <script src="../js/main.js" defer></script>
+</body>
+</html>

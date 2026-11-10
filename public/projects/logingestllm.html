@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LogIngestLLM case file | Andrew T. Price II</title>
+    <meta name="description" content="LogIngestLLM: a local-only log analyzer and analyst co-pilot that runs on a model you fine-tune yourself.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container nav">
+            <a class="brand" href="../index.html"><span>Andrew T. Price II</span></a>
+            <nav aria-label="Main">
+                <a href="../index.html">Home</a>
+                <a href="../portfolio.html" aria-current="page">Projects</a>
+                <a href="../resume.html">Resume</a>
+                <a href="../contact.html">Contact</a>
+            </nav>
+        </div>
+    </header>
+    <aside class="fast-lane" aria-label="At a glance">
+        <div class="container fast-lane-inner">
+            <p class="fast-lane-facts">Active DoD Secret clearance &middot; CompTIA Security+ (IAT II) &middot; 5+ yrs USAF avionics &middot; Full-stack developer</p>
+            <div class="fast-lane-actions">
+                <span class="badge-open">open to work</span>
+                <a class="fl-resume" href="../resume.html">Resume</a>
+                <a class="fl-linkedin" href="https://www.linkedin.com/in/andrew-price98" target="_blank" rel="noopener">LinkedIn</a>
+                <a class="fl-contact" href="../contact.html">Contact</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="container">
+        <article class="case-file">
+            <p class="case-back"><a href="../portfolio.html">&larr; All projects</a></p>
+            <h1>LogIngestLLM</h1>
+            <p class="case-meta"><span class="sev sev-high">Priority: High</span> <span>Security operations, local AI</span> <span>Python, Qwen3-4B (QLoRA), llama.cpp, Sigma</span></p>
+            <section class="case-section">
+<h2>Summary</h2>
+<p>LogIngestLLM is a local-only log analyzer and analyst co-pilot that runs on a model you fine-tune yourself. It reads Windows Event Logs (including exported <code>.evtx</code>, on any OS), Windows Prefetch, Linux journald and syslog, web server logs and application logs, and picks out the handful of events worth attention. It explains them for people learning to read logs, and gives SOC analysts ATT&amp;CK mapping, indicators, tool detection, a timeline and a cited incident report. Every claim links back to the exact line in the original log, and nothing leaves the machine.</p>
+            </section>
+            <section class="case-section">
+<h2>Problem</h2>
+<p>Logs are mostly noise, and the interesting lines are written for the people who wrote the software. The logs you most need help with are the ones you cannot paste into a cloud chatbot. A small local model can help, but it is fluent and fallible, so the design has to assume it will sometimes be wrong and make that visible.</p>
+            </section>
+            <section class="case-section">
+<h2>What I built</h2>
+<ul>
+<li><strong>Triage.</strong> Clusters thousands of lines into patterns, scores them (about 65 built-in rules, Sigma rules, severity, bursts, first time on this host, tool signatures) and has the model review the top ones: importance, why it matters, what to do.</li>
+<li><strong>Whole-log summary and Explain this event.</strong> Annotated lines, what normal looks like, and a check-it-yourself command in the native <code>journalctl</code>, <code>grep</code> or <code>Get-WinEvent</code> form.</li>
+<li><strong>Tool detection.</strong> Attacker tools, abused built-ins (certutil downloads, encoded PowerShell, LSASS dumps), scanners and tunnels, with where each one ran from on disk and a flag for user-writable or temp folders.</li>
+<li><strong>Jump to the event.</strong> Every event remembers its file and line, journal cursor or Windows record ID, so it opens in the original log with the surrounding lines.</li>
+<li><strong>ATT&amp;CK, indicators, timeline and report.</strong> Evidence-only technique mapping, one timeline across every log in a scan, and a Markdown or printable report with citations resolved to <code>file:line</code>.</li>
+<li><strong>Your own model.</strong> A keyboard-driven label queue, a QLoRA fine-tune of Qwen3-4B that trains on one 8 GB GPU (about 45 minutes on an RTX 4060 Laptop, 5.8 GB VRAM), a promotion gate, and GGUF export for the bundled llama.cpp engine.</li>
+<li><strong>Sigma support</strong> for Windows (Security, Sysmon, PowerShell) and Linux logs. Rules using aggregations or base64 modifiers are skipped and counted, never half-applied.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>How it works</h2>
+<p>Logs are parsed with their position kept, clustered into patterns, scored by rules, Sigma, tool signatures and novelty, then the top patterns go to the model for triage. A digest drives the cited summary. The analyzer itself is pure Python standard library; the model runs in a bundled llama.cpp engine started on <code>127.0.0.1</code>.</p>
+<ul>
+<li><strong>Evidence over eloquence.</strong> Model answers cite numbered log lines (<code>[E3]</code>) that open the original file at that line. Tools the model names are dropped unless their evidence string actually occurs in the log.</li>
+<li><strong>Log text is untrusted input.</strong> Prompts say so, model output is parsed as data, and model-named tools and citations are verified against the log.</li>
+<li><strong>A gate on every change.</strong> A known-answer evaluation covers rules, prompts and the model. A new adapter replaces the current model only if it scores better.</li>
+<li><strong>Local only.</strong> No cloud calls and no telemetry. The dashboard binds to <code>127.0.0.1</code>, checks the Host header, and refuses file browsing if it is ever bound wider. The browser never sends file paths to read.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>Evidence</h2>
+<p>Triage was measured on the same 119 held-out log patterns each time (exact importance level; flags means worth knowing versus noise):</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Model</th><th>Exact level</th><th>Within one level</th><th>Flag precision</th><th>Flag recall</th></tr></thead>
+<tbody>
+<tr><td>Qwen3-4B base, no fine-tune</td><td>34.5%</td><td>72.3%</td><td>74.8%</td><td>100%</td></tr>
+<tr><td>v1: rule labels plus Pi and Linux synthetic data</td><td>67.2%</td><td>85.7%</td><td>98.7%</td><td>85.4%</td></tr>
+<tr><td>v2: rebalanced Linux, Windows and web data, tool-aware labels</td><td>91.6%</td><td>98.3%</td><td>100%</td><td>100%</td></tr>
+</tbody></table></div>
+<p>End to end through the built-in engine (Q4_K_M plus LoRA in llama.cpp, deterministic), the known-answer evaluation passes 95 of 96 checks across five investigations: a Windows intrusion, a Linux break-in, a scanned web server, a failing device and a healthy laptop. The one miss is a training-data gap (privileged-group changes) that is already added for the next retrain. Anyone can reproduce it with <code>python -m logagent eval --model</code>.</p>
+<p class="case-note">My homepage card quotes an earlier measurement, 33% to 87% importance accuracy. The table above is the current README: the base model's 34.5% exact level against 91.6% for v2.</p>
+            </section>
+            <section class="case-section">
+<h2>What I'd do next</h2>
+<ul>
+<li><strong>Retrain on the miss.</strong> The privileged-group-change examples are already added, so the next retrain should close the one failed known-answer check.</li>
+<li><strong>Code-signed builds.</strong> The Windows, macOS and Linux downloads are not code-signed yet, so SmartScreen and Gatekeeper ask once.</li>
+<li><strong>Remote collection.</strong> Collection is local by design. Logs from other machines are analyzed by copying or exporting them here, and I would keep that boundary rather than add a network path for log data.</li>
+<li><strong>Sigma coverage.</strong> Aggregation-based and base64-modifier Sigma rules are skipped today.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>Links</h2>
+<ul class="case-links">
+<li><a class="btn btn-small" href="https://github.com/AndrewPrice98/LogIngestLLM" target="_blank" rel="noopener">Code on GitHub</a></li>
+<li><a class="btn btn-small btn-ghost" href="https://github.com/AndrewPrice98/LogIngestLLM/blob/main/docs/ENGINEERING.md" target="_blank" rel="noopener">Engineering notes</a></li>
+<li><a class="btn btn-small btn-ghost" href="../portfolio.html">Back to all projects</a></li>
+</ul>
+            </section>
+        </article>
+    </main>
+
+    <footer class="site-footer status-bar">
+        <div class="status-left">
+            <span class="status-branch">&#x2387; main</span>
+            <span class="status-ok">&#x2713; 0 errors</span>
+            <span>&copy; 2026 Andrew T. Price II</span>
+        </div>
+        <div class="status-right">
+            <span class="status-extra">UTF-8</span>
+            <span class="status-extra">HTML</span>
+            <a href="https://github.com/AndrewPrice98" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+
+    <script src="../js/main.js" defer></script>
+</body>
+</html>

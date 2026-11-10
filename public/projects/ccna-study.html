@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CCNA Study case file | Andrew T. Price II</title>
+    <meta name="description" content="CCNA Study: a study platform for the CCNA 200-301 exam built around a Cisco IOS simulator I wrote in JavaScript.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container nav">
+            <a class="brand" href="../index.html"><span>Andrew T. Price II</span></a>
+            <nav aria-label="Main">
+                <a href="../index.html">Home</a>
+                <a href="../portfolio.html" aria-current="page">Projects</a>
+                <a href="../resume.html">Resume</a>
+                <a href="../contact.html">Contact</a>
+            </nav>
+        </div>
+    </header>
+    <aside class="fast-lane" aria-label="At a glance">
+        <div class="container fast-lane-inner">
+            <p class="fast-lane-facts">Active DoD Secret clearance &middot; CompTIA Security+ (IAT II) &middot; 5+ yrs USAF avionics &middot; Full-stack developer</p>
+            <div class="fast-lane-actions">
+                <span class="badge-open">open to work</span>
+                <a class="fl-resume" href="../resume.html">Resume</a>
+                <a class="fl-linkedin" href="https://www.linkedin.com/in/andrew-price98" target="_blank" rel="noopener">LinkedIn</a>
+                <a class="fl-contact" href="../contact.html">Contact</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="container">
+        <article class="case-file">
+            <p class="case-back"><a href="../portfolio.html">&larr; All projects</a></p>
+            <h1>CCNA Study</h1>
+            <p class="case-meta"><span class="sev sev-medium">Priority: Medium</span> <span>Networking, web development</span> <span>React, JavaScript, Vite</span></p>
+            <section class="case-section">
+<h2>Summary</h2>
+<p>CCNA Study is a study companion for the CCNA 200-301 (v1.1) exam, organized around the <em>CCNA 200-301 Official Cert Guide Library</em>. Its core is a Cisco IOS simulator I wrote from scratch in JavaScript, so the labs run in the browser with nothing to install. Around it sit a 56-chapter study plan, quizzes, flashcards, a subnetting trainer and an exam-topic tracker.</p>
+            </section>
+            <section class="case-section">
+<h2>Problem</h2>
+<p>Networking is learned by typing commands and seeing what the network does, but a practice lab normally means installing a simulator. I wanted hands-on labs anyone could open in a browser, graded as you type, and tied to a study plan so that every chapter has a checklist, flashcards, a quiz and linked labs.</p>
+            </section>
+            <section class="case-section">
+<h2>What I built</h2>
+<ul>
+<li><strong>17 labs</strong> in a simulated Cisco CLI. Tasks check themselves off as you complete them.</li>
+<li><strong>A study plan</strong> of 56 chapters in 15 parts, with a checklist per chapter (every book section with its printed page) and a week-by-week schedule from your hours per week.</li>
+<li><strong>225 original quiz questions</strong> tagged by chapter. Scoring 85% or better on a chapter checks it off in the plan.</li>
+<li><strong>196 original flashcards and glossary terms</strong>, a subnetting trainer with problems at three difficulty levels, and an exam-topics view showing which chapters cover each v1.1 topic.</li>
+<li><strong>Connect your book.</strong> Each reader picks their own PDF. It is stored in that browser (IndexedDB), never uploaded, and every page number on the site opens it at that printed page.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>How it works</h2>
+<p>The simulator lives in <code>src/sim/</code> and is split by job:</p>
+<ul>
+<li><code>engine.js</code>: devices, cabling, terminals, syslog messages, ping and traceroute, SSH and Telnet, PC commands and task checks.</li>
+<li><code>cli.js</code>: IOS modes, abbreviations, <code>?</code> help, Tab completion, <code>no</code> forms and every supported command.</li>
+<li><code>network.js</code>: link state, DTP and trunks, EtherChannel, Rapid PVST+, VLAN segments, static and OSPF routing, HSRP, ACLs, NAT, DHCP, DHCP snooping, DAI and port security.</li>
+<li><code>show.js</code>: <code>show</code> output formatted like IOS XE.</li>
+</ul>
+<p>Each lab is plain data: a topology, starting configs, tasks (each with a <code>check(api)</code> function) and a solution. All study content is plain data too, so adding a question or a lab does not touch the app code. Progress is kept in the browser's localStorage, so each visitor tracks their own.</p>
+<figure class="case-figure">
+<img src="../images/cases/ccna-study-today.webp" alt="CCNA Study home screen: a switch faceplate where each port is a chapter, an Up next card for Volume 1 Chapter 1, and counters for chapters, labs and questions" width="1200" height="750" loading="lazy">
+<figcaption>The Today screen: each port on the switch faceplate is a chapter (amber started, green done).</figcaption>
+</figure>
+            </section>
+            <section class="case-section">
+<h2>Evidence</h2>
+<ul>
+<li>The site is live and the simulator, labs, quizzes and flashcards all run client-side.</li>
+<li>The counts above (56 chapters, 17 labs, 225 questions, 196 terms) are the figures in the repository's README, and the live site shows the 56 chapters and 17 labs on its Today screen.</li>
+<li>The book's chapter and section titles and page numbers are used only as references. All notes, questions, definitions and labs are original, and the PDF is never hosted.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>What I'd do next</h2>
+<ul>
+<li><strong>Widen the simulator.</strong> A simulated CLI can only teach the commands and protocols it implements, so the supported list in <code>cli.js</code> and <code>network.js</code> is the boundary for any new lab.</li>
+<li><strong>More labs against the exam topics.</strong> The exam-topics view already shows coverage per chapter, which is where gaps show up.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>Links</h2>
+<ul class="case-links">
+<li><a class="btn btn-small" href="https://ccna-study-one.vercel.app/" target="_blank" rel="noopener">Live site</a></li>
+<li><a class="btn btn-small btn-ghost" href="https://github.com/AndrewPrice98/CCNA_study" target="_blank" rel="noopener">Code on GitHub</a></li>
+<li><a class="btn btn-small btn-ghost" href="../portfolio.html">Back to all projects</a></li>
+</ul>
+            </section>
+        </article>
+    </main>
+
+    <footer class="site-footer status-bar">
+        <div class="status-left">
+            <span class="status-branch">&#x2387; main</span>
+            <span class="status-ok">&#x2713; 0 errors</span>
+            <span>&copy; 2026 Andrew T. Price II</span>
+        </div>
+        <div class="status-right">
+            <span class="status-extra">UTF-8</span>
+            <span class="status-extra">HTML</span>
+            <a href="https://github.com/AndrewPrice98" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+
+    <script src="../js/main.js" defer></script>
+</body>
+</html>

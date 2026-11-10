@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Job Tracker case file | Andrew T. Price II</title>
+    <meta name="description" content="Job Tracker: a job-search organizer that reads your inbox, classifies application emails and builds a pipeline per company.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container nav">
+            <a class="brand" href="../index.html"><span>Andrew T. Price II</span></a>
+            <nav aria-label="Main">
+                <a href="../index.html">Home</a>
+                <a href="../portfolio.html" aria-current="page">Projects</a>
+                <a href="../resume.html">Resume</a>
+                <a href="../contact.html">Contact</a>
+            </nav>
+        </div>
+    </header>
+    <aside class="fast-lane" aria-label="At a glance">
+        <div class="container fast-lane-inner">
+            <p class="fast-lane-facts">Active DoD Secret clearance &middot; CompTIA Security+ (IAT II) &middot; 5+ yrs USAF avionics &middot; Full-stack developer</p>
+            <div class="fast-lane-actions">
+                <span class="badge-open">open to work</span>
+                <a class="fl-resume" href="../resume.html">Resume</a>
+                <a class="fl-linkedin" href="https://www.linkedin.com/in/andrew-price98" target="_blank" rel="noopener">LinkedIn</a>
+                <a class="fl-contact" href="../contact.html">Contact</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="container">
+        <article class="case-file">
+            <p class="case-back"><a href="../portfolio.html">&larr; All projects</a></p>
+            <h1>Job Tracker</h1>
+            <p class="case-meta"><span class="sev sev-medium">Priority: Medium</span> <span>Web development, email integration</span> <span>React, Node, Vercel functions, Microsoft Graph (MSAL), IMAP</span></p>
+            <section class="case-section">
+<h2>Summary</h2>
+<p>Job Tracker is a job-search organizer that reads your inbox. It signs in to Gmail over IMAP through a Vercel serverless function, or to Outlook through Microsoft Graph with MSAL sign-in, finds the emails about your own applications, classifies each one's stage, pulls out the role, interview time and salary, and builds a pipeline per company. It also has an interview calendar, side-by-side offer comparison, a STAR story bank and LinkedIn import. This one is code only: its Vercel deployment no longer exists.</p>
+            </section>
+            <section class="case-section">
+<h2>Problem</h2>
+<p>A job search scatters its state across an inbox: confirmations, assessments, interview invites, offers and rejections, mixed in with job-board alerts and newsletters. Keeping a spreadsheet by hand falls behind. I wanted it to read the mail, but handling someone's mailbox credentials is the part a tool like this must get right, so the design is built around not holding them.</p>
+            </section>
+            <section class="case-section">
+<h2>What I built</h2>
+<ul>
+<li><strong>Two inbox connectors.</strong> Gmail with an app password the user creates in their own Google account (no developer registration). Outlook through Microsoft sign-in, because Microsoft has turned off app passwords for mail apps.</li>
+<li><strong>A matcher</strong> that decides whether an email is about one of your own applications, using a keyword file.</li>
+<li><strong>A stage classifier</strong> with six stages: application received, assessment, interview, offer, rejection, and withdrawn or closed.</li>
+<li><strong>Detail extraction</strong>: role and company, interview time, assessment deadline and salary on offers.</li>
+<li><strong>A pipeline per company</strong>, an interview calendar, offer comparison, a STAR story bank, LinkedIn import and a resume box.</li>
+<li><strong>Backups.</strong> Everything is stored in the visitor's own browser, with <strong>Your data, Export backup</strong> to move or back it up.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>How it works</h2>
+<ul>
+<li><strong>Gmail path.</strong> The serverless function <code>api/scan-email.js</code> connects over IMAP with <code>imapflow</code>, scans All Mail, and looks back at most 180 days. A cheap pass reads headers only (up to 3,000 envelopes) to pick likely job emails. A full pass then downloads the newest candidates, at most 150 per scan, and parses them. The credential is used once and never stored.</li>
+<li><strong>Outlook path.</strong> The browser signs in with MSAL and reads mail through Microsoft Graph with the delegated <code>Mail.Read</code> permission. It is a single-page-app registration with no client secret.</li>
+<li><strong>Matching rules.</strong> Subjects matching an exclude phrase (alerts, newsletters) are dropped. A phrase is strong when it names the application itself, or weak when it is generic. An email needs at least one strong phrase and a job-related word, so a credit card application does not count, and it must reach a score threshold. Applicant-tracking-system senders add weight, while job boards, which mostly send alerts, need more evidence. The same rules serve both Gmail and Outlook scans.</li>
+<li><strong>Stage ties.</strong> When an email matches several stages equally, the later stage wins.</li>
+<li><strong>Refresh.</strong> While the app is open, each connected inbox is checked every 30 minutes, fetching only mail newer than the last scan. There is no background checking while the site is closed, because that would need a server holding users' mail credentials.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>Evidence</h2>
+<ul>
+<li>The repository ships a <code>SETUP.md</code> that walks through the Azure app registration, the Vercel deployment, and the manifest fix for personal-account sign-in errors.</li>
+<li>The classifier reads the same <code>job-application-keywords.json</code> in the browser and in the serverless function, so there is one set of rules to tune.</li>
+<li>The honest limit: this page has no live demo or screenshot, because the Vercel deployment is gone. The code is the evidence.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>What I'd do next</h2>
+<ul>
+<li><strong>Rate-limit the scan endpoint.</strong> The setup guide already calls for a Vercel Firewall rule on <code>/api/scan-email</code>, because without one anyone could use that endpoint to test stolen Gmail passwords. I would build the limit into the function instead of leaving it as an operator step.</li>
+<li><strong>Account coverage.</strong> Some accounts cannot create app passwords at all, for example many work or school accounts and accounts with Advanced Protection, and some companies block employees from approving apps themselves.</li>
+<li><strong>Outlook sign-in time.</strong> Microsoft limits how long a browser app can stay signed in, so Outlook refreshes on its own for only about a day before asking the user to sign in again.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>Links</h2>
+<ul class="case-links">
+<li><a class="btn btn-small" href="https://github.com/AndrewPrice98/JobTracker" target="_blank" rel="noopener">Code on GitHub</a></li>
+<li><a class="btn btn-small btn-ghost" href="https://github.com/AndrewPrice98/JobTracker/blob/main/SETUP.md" target="_blank" rel="noopener">Setup guide</a></li>
+<li><a class="btn btn-small btn-ghost" href="../portfolio.html">Back to all projects</a></li>
+</ul>
+            </section>
+        </article>
+    </main>
+
+    <footer class="site-footer status-bar">
+        <div class="status-left">
+            <span class="status-branch">&#x2387; main</span>
+            <span class="status-ok">&#x2713; 0 errors</span>
+            <span>&copy; 2026 Andrew T. Price II</span>
+        </div>
+        <div class="status-right">
+            <span class="status-extra">UTF-8</span>
+            <span class="status-extra">HTML</span>
+            <a href="https://github.com/AndrewPrice98" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+
+    <script src="../js/main.js" defer></script>
+</body>
+</html>

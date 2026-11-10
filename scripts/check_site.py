@@ -178,8 +178,65 @@ def check_titles(site):
             if not (t := text_walk(html).title.strip()).endswith(TITLE_SUFFIX)]
 
 
+CASE_SLUGS = ["netguard", "logingestllm", "ccna-study", "cysa-study",
+              "job-tracker", "flight-tracker", "tempered", "sudo-snake"]
+CASE_SECTIONS = ["Summary", "Problem", "What I built", "How it works",
+                 "Evidence", "What I'd do next", "Links"]
+
+
+class CaseWalker(HTMLParser):
+    """Collects the h2 texts and the images of a case-file page."""
+
+    def __init__(self):
+        super().__init__()
+        self.h2s, self._h2, self.imgs = [], None, []
+        self.has_case = False
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        if tag == "article" and "case-file" in (a.get("class") or "").split():
+            self.has_case = True
+        if tag == "h2":
+            self._h2 = ""
+        if tag == "img":
+            self.imgs.append(a)
+
+    def handle_endtag(self, tag):
+        if tag == "h2" and self._h2 is not None:
+            self.h2s.append(" ".join(self._h2.split()))
+            self._h2 = None
+
+    def handle_data(self, data):
+        if self._h2 is not None:
+            self._h2 += data
+
+
+def check_case_files(site):
+    problems = []
+    for slug in CASE_SLUGS:
+        name = f"projects/{slug}.html"
+        html = site.pages.get(name)
+        if html is None:
+            problems.append(f"{name}: missing")
+            continue
+        w = CaseWalker()
+        w.feed(html)
+        w.close()
+        if not w.has_case:
+            problems.append(f"{name}: no article.case-file")
+        if w.h2s != CASE_SECTIONS:
+            problems.append(f"{name}: h2 sections are {w.h2s}, expected {CASE_SECTIONS}")
+        for img in w.imgs:
+            for attr in ("alt", "width", "height"):
+                if not img.get(attr):
+                    problems.append(f"{name}: img {img.get('src')} lacks {attr}")
+            if img.get("loading") != "lazy":
+                problems.append(f"{name}: img {img.get('src')} lacks loading=lazy")
+    return problems
+
+
 CHECKS = [check_balanced, check_links, check_no_empty_links,
-          check_nav, check_fast_lane, check_titles]
+          check_nav, check_fast_lane, check_titles, check_case_files]
 
 
 def main(argv):

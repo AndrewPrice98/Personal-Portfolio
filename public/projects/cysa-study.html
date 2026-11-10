@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CySA+ Study case file | Andrew T. Price II</title>
+    <meta name="description" content="CySA+ Study: an exam trainer for CompTIA CySA+ CS0-004 with 16 performance-based labs run in a Linux shell I built in JavaScript.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container nav">
+            <a class="brand" href="../index.html"><span>Andrew T. Price II</span></a>
+            <nav aria-label="Main">
+                <a href="../index.html">Home</a>
+                <a href="../portfolio.html" aria-current="page">Projects</a>
+                <a href="../resume.html">Resume</a>
+                <a href="../contact.html">Contact</a>
+            </nav>
+        </div>
+    </header>
+    <aside class="fast-lane" aria-label="At a glance">
+        <div class="container fast-lane-inner">
+            <p class="fast-lane-facts">Active DoD Secret clearance &middot; CompTIA Security+ (IAT II) &middot; 5+ yrs USAF avionics &middot; Full-stack developer</p>
+            <div class="fast-lane-actions">
+                <span class="badge-open">open to work</span>
+                <a class="fl-resume" href="../resume.html">Resume</a>
+                <a class="fl-linkedin" href="https://www.linkedin.com/in/andrew-price98" target="_blank" rel="noopener">LinkedIn</a>
+                <a class="fl-contact" href="../contact.html">Contact</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="container">
+        <article class="case-file">
+            <p class="case-back"><a href="../portfolio.html">&larr; All projects</a></p>
+            <h1>CySA+ Study</h1>
+            <p class="case-meta"><span class="sev sev-high">Priority: High</span> <span>Security operations, web development</span> <span>React, JavaScript, Vite, a shell I wrote in pure JS</span></p>
+            <section class="case-section">
+<h2>Summary</h2>
+<p>CySA+ Study is an exam trainer for CompTIA CySA+ (CS0-004), the V4 exam. Its centrepiece is 16 performance-based labs where you investigate evidence in a Linux shell I built in pure JavaScript, flag malicious log lines, write firewall rules and order incident response steps, all with partial-credit grading. It is a static Vite and React site, with no server behind it.</p>
+            </section>
+            <section class="case-section">
+<h2>Problem</h2>
+<p>The performance-based questions are the hardest part of the exam to practice, because they ask you to do analyst work, not recall a fact. I wanted the labs to feel like the real work: a SIEM alert, a forensic copy of the logs, and a shell to dig through them. They also had to be provably correct, since a lab with a wrong answer key teaches the wrong thing.</p>
+            </section>
+            <section class="case-section">
+<h2>What I built</h2>
+<ul>
+<li><strong>16 PBQ labs</strong>, including SSH brute force, DNS tunnelling, beaconing in Zeek logs, phishing headers, ransomware IR, nmap scan results, firewall rules and vulnerability prioritization. Each has a scenario, evidence files, hints, a full solution and explanations.</li>
+<li><strong>An analyst shell</strong> over each lab's virtual files, with pipes and <code>grep</code>, <code>awk</code>, <code>sort</code>, <code>uniq -c</code>, <code>cut</code>, <code>tr</code>, <code>head</code>, <code>tail</code>, <code>wc</code>, <code>base64 -d</code> (including PowerShell UTF-16LE), <code>sha256sum</code>, <code>strings</code> and <code>find</code>.</li>
+<li><strong>A timed exam simulator</strong> that opens with PBQ labs like the real exam, then multiple choice weighted by domain, with flagging, a question grid and a review of every item.</li>
+<li><strong>Practice questions</strong> (410 in the live app) tagged by objective, many with log, packet, header or scan exhibits, plus 819 flashcards.</li>
+<li><strong>A study guide</strong> for all 15 V4 objectives across the 4 domains (34, 26, 24 and 16% of the exam), a CVSS v3.1 base-score calculator following the FIRST spec, and a reference section (Kill Chain, Diamond Model, ATT&amp;CK tactics, NIST IR life cycle, Windows Event IDs).</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>How it works</h2>
+<ul>
+<li><code>src/lib/shell.js</code> is the pure-JS shell. It supports <code>grep</code> with BRE and ERE and the <code>-i -v -c -n -o -w -l -r -A -B</code> flags, and an <code>awk</code> with patterns, fields, arrays, <code>END</code> and <code>printf</code>.</li>
+<li><code>src/lib/grade.js</code> defines the task types (<code>input</code>, <code>single</code>, <code>multi</code>, <code>lines</code>, <code>order</code>, <code>grid</code>), the partial-credit scoring and <code>validateLab</code>.</li>
+<li>Each lab is one file in <code>src/data/labs/</code>. All study content is plain data, so adding a question with the right objective makes it show up in the filters, the dashboard and the exam simulator.</li>
+<li>Progress lives in the browser's localStorage. Nothing is sent anywhere.</li>
+</ul>
+<figure class="case-figure">
+<img src="../images/cases/cysa-study-lab.webp" alt="CySA+ Study lab page for SSH brute force on a web server, with a simulated Linux terminal on the left and numbered questions on the right" width="1200" height="750" loading="lazy">
+<figcaption>A PBQ lab: a SIEM alert on web-prod-02, a shell over the forensic copy of its logs, and eight questions to answer.</figcaption>
+</figure>
+            </section>
+            <section class="case-section">
+<h2>Evidence</h2>
+<p><code>node scripts/validate-labs.mjs</code> checks every lab: the answer keys are consistent, the solution scores 100%, and every terminal task's command really prints its answer from the evidence. That is the guard against shipping a lab that cannot be solved the way it says.</p>
+<p>The site is live, runs entirely in the browser, and is unofficial: it is not affiliated with CompTIA, and all notes, questions, labs and definitions are original.</p>
+            </section>
+            <section class="case-section">
+<h2>What I'd do next</h2>
+<ul>
+<li><strong>Check the objective topics against CompTIA's PDF.</strong> The V4 page lists the 15 objectives with a one-line scope each and no numbers or sub-bullets. The topic lists under each objective are built from those scope lines plus the CS0-003 outline they replace, so they are not CompTIA's wording and should be checked against the official objectives.</li>
+<li><strong>Keep the validator as the gate.</strong> Any new lab goes through the same script before it ships.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>Links</h2>
+<ul class="case-links">
+<li><a class="btn btn-small" href="https://cysa-sigma.vercel.app" target="_blank" rel="noopener">Live site</a></li>
+<li><a class="btn btn-small btn-ghost" href="https://github.com/AndrewPrice98/CySA-" target="_blank" rel="noopener">Code on GitHub</a></li>
+<li><a class="btn btn-small btn-ghost" href="../portfolio.html">Back to all projects</a></li>
+</ul>
+            </section>
+        </article>
+    </main>
+
+    <footer class="site-footer status-bar">
+        <div class="status-left">
+            <span class="status-branch">&#x2387; main</span>
+            <span class="status-ok">&#x2713; 0 errors</span>
+            <span>&copy; 2026 Andrew T. Price II</span>
+        </div>
+        <div class="status-right">
+            <span class="status-extra">UTF-8</span>
+            <span class="status-extra">HTML</span>
+            <a href="https://github.com/AndrewPrice98" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+
+    <script src="../js/main.js" defer></script>
+</body>
+</html>

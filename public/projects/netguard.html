@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NetGuard case file | Andrew T. Price II</title>
+    <meta name="description" content="NetGuard: a network intrusion detection system and SOC console for small networks, written in standard-library Python.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container nav">
+            <a class="brand" href="../index.html"><span>Andrew T. Price II</span></a>
+            <nav aria-label="Main">
+                <a href="../index.html">Home</a>
+                <a href="../portfolio.html" aria-current="page">Projects</a>
+                <a href="../resume.html">Resume</a>
+                <a href="../contact.html">Contact</a>
+            </nav>
+        </div>
+    </header>
+    <aside class="fast-lane" aria-label="At a glance">
+        <div class="container fast-lane-inner">
+            <p class="fast-lane-facts">Active DoD Secret clearance &middot; CompTIA Security+ (IAT II) &middot; 5+ yrs USAF avionics &middot; Full-stack developer</p>
+            <div class="fast-lane-actions">
+                <span class="badge-open">open to work</span>
+                <a class="fl-resume" href="../resume.html">Resume</a>
+                <a class="fl-linkedin" href="https://www.linkedin.com/in/andrew-price98" target="_blank" rel="noopener">LinkedIn</a>
+                <a class="fl-contact" href="../contact.html">Contact</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="container">
+        <article class="case-file">
+            <p class="case-back"><a href="../portfolio.html">&larr; All projects</a></p>
+            <h1>NetGuard</h1>
+            <p class="case-meta"><span class="sev sev-high">Priority: High</span> <span>Network security, detection engineering</span> <span>Python (standard library), SQLite, MITRE ATT&amp;CK, pcap</span></p>
+            <section class="case-section">
+<h2>Summary</h2>
+<p>NetGuard is a network intrusion detection system and SOC console for small networks, written in standard-library Python with no dependencies. It learns what a network normally looks like, flags the changes that signal an intruder or a man-in-the-middle, groups related alerts into incidents with an ATT&amp;CK-mapped attack chain, and measures how quickly and how accurately those alerts get handled. Every detection is proven by a replayable attack simulation that runs in CI.</p>
+            </section>
+            <section class="case-section">
+<h2>Problem</h2>
+<p>A small network has no analyst watching it. A new device joining, a port scan, or a forged ARP reply claiming the router's address are each easy to miss, and seen one at a time they look routine. Four alerts on one device in three hours are one decision, not four, so a pile of alerts is not enough: someone has to turn them into a case, work it, and know whether the rules behind them can be trusted.</p>
+<p>I wanted one tool that covers the whole analyst loop on a network I could actually test: detection, correlation, triage, forensics and reporting. And because it is a security tool, its own dashboard could not be the weak spot.</p>
+            </section>
+            <section class="case-section">
+<h2>What I built</h2>
+<ul>
+<li><strong>Detection engineering.</strong> Ten rules, each mapped to MITRE ATT&amp;CK with a severity rationale, documented blind spots and tuning notes: gateway ARP spoofing, rogue DHCP, port scans, new devices and new listening ports, among others.</li>
+<li><strong>Detection validation.</strong> Attack simulations that must fire, benign traffic that must not, and one documented gap, all enforced in CI.</li>
+<li><strong>Incident correlation.</strong> Alerts grouped by device and time, matched to attack patterns, and escalated when they span several tactics.</li>
+<li><strong>Triage and metrics.</strong> A New, Investigating, Resolved or False positive workflow with notes and an audit trail, plus MTTA, MTTR, false-positive rate and per-rule true-positive rate.</li>
+<li><strong>Network forensics.</strong> A pcap and pcapng parser written from scratch, replaying the same detections offline with evidence cited by frame number.</li>
+<li><strong>SIEM integration.</strong> Alerts out as Elastic Common Schema, CEF (Splunk, QRadar, ArcSight, Sentinel) or syslog, carrying the ATT&amp;CK technique.</li>
+<li><strong>Reporting and playbooks.</strong> Auto-drafted Markdown incident reports and a triage checklist per alert type.</li>
+<li><strong>A hardened dashboard.</strong> Binds to 127.0.0.1, a Host-header allow-list against DNS rebinding, a CSRF header on state-changing requests, a strict Content-Security-Policy, and CSV exports that neutralize formula injection.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>How it works</h2>
+<ol>
+<li><strong>Discovery.</strong> An in-process ARP sweep needs no admin rights. Optional live capture (scapy) catches ARP and DHCP attacks within seconds.</li>
+<li><strong>Identity is the MAC, not the IP.</strong> IPs move on DHCP networks. A MAC changing for a fixed IP, or one MAC holding several IPs, is the real signal.</li>
+<li><strong>Baseline, then diff.</strong> The first scan is the baseline. Detection rules are pure functions over a SQLite store, so every rule is unit-tested without a network.</li>
+<li><strong>One detection path.</strong> Live packets, capture files and simulations all decode to the same events and go through one <code>dispatch()</code>, so offline and live results cannot drift apart.</li>
+<li><strong>Incidents are derived, not stored.</strong> The correlation engine attributes each alert to a device, splits a device's alerts into clusters at gaps longer than 24 hours, and promotes a cluster to an incident if it holds a HIGH alert or two MEDIUMs. Low-level noise stays in the queue. Severity is escalated when a cluster spans three or more ATT&amp;CK tactics.</li>
+</ol>
+<figure class="case-figure">
+<img src="../images/cases/netguard-incident.webp" alt="NetGuard incident page for INC-0015, showing the attack chain, ATT&amp;CK techniques, indicators and response steps" width="1200" height="958" loading="lazy">
+<figcaption>Incident INC-0015 in the demo dashboard: the kill chain in the order the attacker reached it, with indicators and response steps.</figcaption>
+</figure>
+            </section>
+            <section class="case-section">
+<h2>Evidence</h2>
+<p>Detection validation replays seven attack simulations through the live detectors, and CI fails if a detection regresses or starts firing on benign traffic:</p>
+<pre><code>$ netguard validate
+  PASS    benign_baseline             no alerts (false-positive check)
+  PASS    arp_spoof_gateway           fires gateway_arp_spoof
+  PASS    arp_poison_host             fires arp_mismatch
+  PASS    rogue_dhcp                  fires rogue_dhcp
+  PASS    port_scan                   fires port_scan
+  PASS    slow_scan_below_threshold   silent: port_scan (known gap)
+  PASS    mitm_kill_chain             fires gateway_arp_spoof, port_scan
+
+7/7 passed</code></pre>
+<p>The suite runs 120+ tests, on Windows, macOS and Linux (Python 3.11 and 3.13), plus a separate job that replays every scenario.</p>
+<p><strong>Written case, INC-0015.</strong> I wrote up an adversary-in-the-middle exercise the way an analyst writes an incident report. It is a purple-team lab on a fictional network, not a real compromise. The traffic is a committed capture (162 packets over 208.0 s) that anyone can open in Wireshark, and every frame number in the write-up can be checked against it.</p>
+<ul>
+<li>An unknown device took a DHCP lease, swept the NAS and a laptop for open services, and about 90 seconds later started forging ARP replies claiming the router's address.</li>
+<li>NetGuard raised a HIGH <code>port_scan</code> at frame 56 (15 ports in 10 s) and a CRITICAL <code>gateway_arp_spoof</code> on the first forged packet, frame 148. The 14 replies after it were held back by a 5-minute cooldown, so one condition made one alert.</li>
+<li>Correlation turned the alerts into one critical incident spanning four ATT&amp;CK tactics: T1200, T1046, T1021 and T1557.002.</li>
+<li>Going back to the packets showed something the alerts did not: the capture holds two scan sweeps, but the rule's 60-second cooldown folded the second into the first alert. I recorded it as a known behaviour.</li>
+<li>On scope, the capture shows the poisoning was attempted continuously but does not prove it succeeded, so the write-up says to check the victim's ARP cache and assume interception when rotating credentials.</li>
+</ul>
+<figure class="case-figure">
+<img src="../images/cases/netguard-dashboard.webp" alt="NetGuard overview dashboard on the demo network: open incidents, response-time metrics, alerts by day, a network map and the highest-risk devices" width="1200" height="958" loading="lazy">
+<figcaption>The demo network (<code>netguard demo</code>). The figures on screen come from fictional demo data.</figcaption>
+</figure><figure class="case-figure">
+<img src="../images/cases/netguard-detections.webp" alt="NetGuard Detections page: response metrics, ATT&amp;CK coverage by tactic, a per-rule fidelity table and attack simulation results" width="1200" height="1300" loading="lazy">
+<figcaption>The Detections page, the tuning view: response metrics, ATT&amp;CK coverage, per-rule true-positive rate and simulation results.</figcaption>
+</figure>
+            </section>
+            <section class="case-section">
+<h2>What I'd do next</h2>
+<ul>
+<li><strong>Close the cooldown gap found in INC-0015.</strong> Report scan targets in the <code>port_scan</code> alert and re-alert when a flagged source sweeps a new target during the cooldown. This is on my backlog.</li>
+<li><strong>Low-and-slow scans.</strong> Scans below the threshold are not detected. It is documented and tested as a known gap.</li>
+<li><strong>Better placement.</strong> On Wi-Fi a sniffer sees broadcast traffic and its own only, so unicast poisoning aimed at other devices can be invisible. A wired sensor on a mirror port or offline pcap analysis has no such limit.</li>
+<li><strong>Beyond the network.</strong> A network sensor cannot see tactics such as execution or privilege escalation, so NetGuard lists them as out of view and says to pair it with EDR or Sysmon. It is also IPv4 only.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>Links</h2>
+<ul class="case-links">
+<li><a class="btn btn-small" href="https://github.com/AndrewPrice98/NetGuard" target="_blank" rel="noopener">Code on GitHub</a></li>
+<li><a class="btn btn-small btn-ghost" href="https://github.com/AndrewPrice98/NetGuard/blob/main/docs/case-study-INC-0015.md" target="_blank" rel="noopener">Case study INC-0015</a></li>
+<li><a class="btn btn-small btn-ghost" href="https://github.com/AndrewPrice98/NetGuard/blob/main/docs/DETECTIONS.md" target="_blank" rel="noopener">Detection catalog</a></li>
+<li><a class="btn btn-small btn-ghost" href="../portfolio.html">Back to all projects</a></li>
+</ul>
+            </section>
+        </article>
+    </main>
+
+    <footer class="site-footer status-bar">
+        <div class="status-left">
+            <span class="status-branch">&#x2387; main</span>
+            <span class="status-ok">&#x2713; 0 errors</span>
+            <span>&copy; 2026 Andrew T. Price II</span>
+        </div>
+        <div class="status-right">
+            <span class="status-extra">UTF-8</span>
+            <span class="status-extra">HTML</span>
+            <a href="https://github.com/AndrewPrice98" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+
+    <script src="../js/main.js" defer></script>
+</body>
+</html>
