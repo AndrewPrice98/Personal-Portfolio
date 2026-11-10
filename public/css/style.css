@@ -312,7 +312,9 @@ h3 { font-size: 1.15rem; margin: 0 0 0.5rem; color: var(--yellow); }
 .status-ok { color: var(--green); }
 @media (max-width: 560px) {
     .status-extra { display: none; }
-    nav a { margin-left: 0.8rem; font-size: 0.85rem; }
+    nav { flex: 1 1 100%; display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; }
+    nav a { margin-left: 0; font-size: 0.85rem; }
+    nav a::before { content: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -356,6 +358,7 @@ h3 { font-size: 1.15rem; margin: 0 0 0.5rem; color: var(--yellow); }
 .badge-open::before { content: '\25CF\00a0'; content: '\25CF\00a0' / ''; }
 @media (min-width: 700px) {
     .fast-lane { position: sticky; top: 0; z-index: 10; }
+    html { scroll-padding-top: 7rem; }
 }
 
 /* Visible keyboard focus */
@@ -479,7 +482,9 @@ a:focus-visible, .btn:focus-visible {
 .timeline .pinned::before { background: var(--green); }
 .timeline .next::before { background: var(--bg); border: 2px solid var(--green); }
 @media (min-width: 700px) {
-    .timeline .when, .timeline .pin-label { display: inline-block; min-width: 14rem; }
+    .timeline li { display: grid; grid-template-columns: 14rem 1fr; column-gap: 0.5rem; }
+    .timeline .when, .timeline .pin-label { grid-column: 1; }
+    .timeline .what { grid-column: 2; }
 }
 
 /* Network map: SVG from 700px, plain list below (the hidden one is display:none) */

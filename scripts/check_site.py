@@ -62,16 +62,42 @@ def check_balanced(site):
             for p in walk(html).problems]
 
 
+class IdWalker(HTMLParser):
+    """Collects every id and anchor name on a page."""
+
+    def __init__(self):
+        super().__init__()
+        self.ids = set()
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        self.ids.update(v for k, v in a.items() if k == "id" and v)
+        if tag == "a" and a.get("name"):
+            self.ids.add(a["name"])
+
+
+def page_ids(html):
+    w = IdWalker()
+    w.feed(html)
+    w.close()
+    return w.ids
+
+
 def check_links(site):
     problems = []
     for name, html in site.pages.items():
+        own_ids = page_ids(html)
         for tag, attrs in walk(html).tags:
-            for attr in ("href", "src"):
-                url = attrs.get(attr)
-                if not url or url.startswith(("#", "http:", "https:", "mailto:")):
+            for attr in ("href", "src", "data"):
+                if attr == "data" and tag != "object":
                     continue
-                path = url.split("#")[0].split("?")[0]
+                url = attrs.get(attr)
+                if not url or url.startswith(("http:", "https:", "mailto:", "data:")):
+                    continue
+                path, _, fragment = url.split("?")[0].partition("#")
                 if not path:
+                    if fragment and fragment not in own_ids:
+                        problems.append(f"{name}: broken fragment {url}")
                     continue
                 if path.startswith(SITE_PREFIX):
                     target = site.root / path[len(SITE_PREFIX):]
@@ -84,6 +110,10 @@ def check_links(site):
                     target = target / "index.html"
                 if not target.is_file():
                     problems.append(f"{name}: broken {attr} {url}")
+                elif fragment and target.suffix == ".html":
+                    rel = target.relative_to(site.root).as_posix()
+                    if fragment not in page_ids(site.pages.get(rel, "")):
+                        problems.append(f"{name}: {attr} {url} points at a missing #{fragment}")
     return problems
 
 

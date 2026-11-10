@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>NetGuard case file | Andrew T. Price II</title>
     <meta name="description" content="NetGuard: a network intrusion detection system and SOC console for small networks, written in standard-library Python.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b0e14'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='20' font-weight='700' text-anchor='middle' fill='%235fb8c7'%3E~/%3C/text%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
@@ -16,7 +17,7 @@
             <a class="brand" href="../index.html"><span>Andrew T. Price II</span></a>
             <nav aria-label="Main">
                 <a href="../index.html">Home</a>
-                <a href="../portfolio.html" aria-current="page">Projects</a>
+                <a href="../portfolio.html" aria-current="true">Projects</a>
                 <a href="../resume.html">Resume</a>
                 <a href="../contact.html">Contact</a>
             </nav>
@@ -41,7 +42,7 @@
             <p class="case-meta"><span class="sev sev-crit" data-severity="crit" title="Featured: flagship">CRIT</span> <span class="sev-note">Featured: flagship</span> <span>Network security, detection engineering</span> <span>Python (standard library), SQLite, MITRE ATT&amp;CK, pcap</span></p>
             <section class="case-section">
 <h2>Summary</h2>
-<p>NetGuard is a network intrusion detection system and SOC console for small networks, written in standard-library Python with no dependencies. It learns what a network normally looks like, flags the changes that signal an intruder or a man-in-the-middle, groups related alerts into incidents with an ATT&amp;CK-mapped attack chain, and measures how quickly and how accurately those alerts get handled. Every detection is proven by a replayable attack simulation that runs in CI.</p>
+<p>NetGuard is a network intrusion detection system and SOC console for small networks, written in standard-library Python with no dependencies. It learns what a network normally looks like, flags the changes that signal an intruder or a man-in-the-middle, groups related alerts into incidents with an ATT&amp;CK-mapped attack chain, and measures how quickly and how accurately those alerts get handled. Its live-traffic detections are proven by replayable attack simulations that run in CI, and its scan-based detections are covered by unit tests.</p>
             </section>
             <section class="case-section">
 <h2>Problem</h2>
@@ -77,7 +78,7 @@
             </section>
             <section class="case-section">
 <h2>Evidence</h2>
-<p>Detection validation replays seven attack simulations through the live detectors, and CI fails if a detection regresses or starts firing on benign traffic:</p>
+<p>Detection validation replays seven attack simulations through the live detectors, and CI fails if a detection regresses or starts firing on benign traffic. The four live-traffic rules (<code>gateway_arp_spoof</code>, <code>rogue_dhcp</code>, <code>port_scan</code>, <code>arp_mismatch</code>) are validated this way; the scan-based rules are covered by unit tests:</p>
 <pre><code>$ netguard validate
   PASS    benign_baseline             no alerts (false-positive check)
   PASS    arp_spoof_gateway           fires gateway_arp_spoof
@@ -88,12 +89,12 @@
   PASS    mitm_kill_chain             fires gateway_arp_spoof, port_scan
 
 7/7 passed</code></pre>
-<p>The suite runs 120+ tests, on Windows, macOS and Linux (Python 3.11 and 3.13), plus a separate job that replays every scenario.</p>
+<p>The suite runs 120+ tests, on Windows, macOS and Linux (Python 3.11 and 3.13), plus a separate job that replays every simulation scenario.</p>
 <p><strong>Written case, INC-0015.</strong> I wrote up an adversary-in-the-middle exercise the way an analyst writes an incident report. It is a purple-team lab on a fictional network, not a real compromise. The traffic is a committed capture (162 packets over 208.0 s) that anyone can open in Wireshark, and every frame number in the write-up can be checked against it.</p>
 <ul>
 <li>An unknown device took a DHCP lease, swept the NAS and a laptop for open services, and about 90 seconds later started forging ARP replies claiming the router's address.</li>
 <li>NetGuard raised a HIGH <code>port_scan</code> at frame 56 (15 ports in 10 s) and a CRITICAL <code>gateway_arp_spoof</code> on the first forged packet, frame 148. The 14 replies after it were held back by a 5-minute cooldown, so one condition made one alert.</li>
-<li>Correlation turned the alerts into one critical incident spanning four ATT&amp;CK tactics: T1200, T1046, T1021 and T1557.002.</li>
+<li>Correlation turned the alerts into one critical incident spanning four ATT&amp;CK techniques (T1200, T1046, T1021, T1557.002).</li>
 <li>Going back to the packets showed something the alerts did not: the capture holds two scan sweeps, but the rule's 60-second cooldown folded the second into the first alert. I recorded it as a known behaviour.</li>
 <li>On scope, the capture shows the poisoning was attempted continuously but does not prove it succeeded, so the write-up says to check the victim's ARP cache and assume interception when rotating credentials.</li>
 </ul>

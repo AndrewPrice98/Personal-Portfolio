@@ -192,6 +192,8 @@
     }
 
     // Completes command and slug names. Returns false when there is nothing to complete.
+    var listedFor = null;
+
     function complete() {
         var v = input.value.replace(/^\s+/, '').toLowerCase();
         if (!v) return false;
@@ -203,7 +205,7 @@
             prefix = v.replace(/^open\s+/, '');
             pool = SLUGS;
         } else {
-            pool = Object.keys(COMMANDS).concat(['open', 'sudo hire andrew']);
+            pool = Object.keys(COMMANDS).concat(['open', 'clear', 'sudo hire andrew']);
         }
         var hits = pool.filter(function (c) { return c.indexOf(prefix) === 0; });
         if (!hits.length) return false;
@@ -211,11 +213,15 @@
         hits.forEach(function (h) { while (h.indexOf(common) !== 0) common = common.slice(0, -1); });
         if (hits.length === 1 && common === 'open') common = 'open ';
         if (head + common === input.value.replace(/^\s+/, '') && hits.length === 1) return false;
-        input.value = head + common;
         if (hits.length > 1 && common === prefix) {
+            if (listedFor === input.value) return false;
+            listedFor = input.value;
             echo(head + prefix);
             output([hits.join('  ')]);
+            return true;
         }
+        input.value = head + common;
+        listedFor = null;
         return true;
     }
 
