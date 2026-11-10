@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CMMC Ready case file | Andrew T. Price II</title>
+    <meta name="description" content="CMMC Ready: a CMMC Level 2 self-assessment workbench that scores all 110 NIST SP 800-171 Rev 2 requirements the DoD way, checks the 32 CFR 170.21 rules, and pulls read-only evidence from Windows and Microsoft 365.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b0e14'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='20' font-weight='700' text-anchor='middle' fill='%235fb8c7'%3E~/%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container nav">
+            <a class="brand" href="../index.html"><span>Andrew T. Price II</span></a>
+            <nav aria-label="Main">
+                <a href="../index.html">Home</a>
+                <a href="../portfolio.html" aria-current="true">Projects</a>
+                <a href="../resume.html">Resume</a>
+                <a href="../contact.html">Contact</a>
+            </nav>
+        </div>
+    </header>
+    <aside class="fast-lane" aria-label="At a glance">
+        <div class="container fast-lane-inner">
+            <p class="fast-lane-facts">Active DoD Secret clearance &middot; CompTIA Security+ (IAT II) &middot; 5+ yrs USAF avionics &middot; Full-stack developer</p>
+            <div class="fast-lane-actions">
+                <span class="badge-open">open to work</span>
+                <a class="fl-resume" href="../resume.html">Resume</a>
+                <a class="fl-linkedin" href="https://www.linkedin.com/in/andrew-price98" target="_blank" rel="noopener">LinkedIn <span class="visually-hidden">(opens in a new tab)</span></a>
+                <a class="fl-contact" href="../contact.html">Contact</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="container">
+        <article class="case-file">
+            <p class="case-back"><a href="../portfolio.html">&larr; All projects</a></p>
+            <h1>CMMC Ready</h1>
+            <p class="case-meta"><span class="sev sev-high" data-severity="high" title="Featured: strong">HIGH</span> <span class="sev-note">Featured: strong</span> <span>Compliance, defense industrial base, full stack</span> <span>Python, FastAPI, SQLite, React, Vite, PowerShell, Microsoft Graph</span></p>
+            <section class="case-section">
+<h2>Summary</h2>
+<p>CMMC Ready is a CMMC Level 2 self-assessment workbench for small defense contractors. It walks an organization through all 110 requirements of NIST SP 800-171 Rev 2 and their 320 SP 800-171A assessment objectives, computes the SPRS score exactly as the DoD Assessment Methodology defines it, and checks the 32 CFR 170.21 rules for conditional Level 2 status and POA&amp;M eligibility. Read-only PowerShell collectors pull evidence from Windows endpoints and Microsoft 365 / Entra ID to sit beside the assessor's answers, and when the evidence and the assessor disagree, it says so. It produces the System Security Plan, the POA&amp;M and the SPRS summary as documents you can edit.</p>
+<p class="case-note">CMMC Ready is a self-assessment aid. It does not certify compliance or replace an assessment by a C3PAO or DIBCAC.</p>
+            </section>
+            <section class="case-section">
+<h2>Problem</h2>
+<p>Defense contractors that handle Controlled Unclassified Information have to implement the 110 requirements of NIST SP 800-171 and self-score against the DoD Assessment Methodology. CMMC makes the result a condition of contract award: Phase 1 began on November 10, 2025, and under 32 CFR 170.3(e) Phase 2, when DoD intends to start requiring a Level 2 certification by a C3PAO in applicable solicitations, begins on November 10, 2026.</p>
+<p>A small contractor usually tracks this in spreadsheets. The scoring has traps (weights of 5, 3 and 1, partial credit for MFA and FIPS cryptography, no score at all without a System Security Plan), the POA&amp;M rules bar some gaps by name, and nothing ties an answer of "Met" to what the machines are actually configured to do. I wanted one tool that gets the arithmetic and the rules exactly right, shows its sources, and puts real configuration evidence next to every answer without ever overruling the assessor.</p>
+            </section>
+            <section class="case-section">
+<h2>What I built</h2>
+<ul>
+<li><strong>A verified catalog.</strong> All 110 Rev 2 requirements and 320 objectives with their DoD weights, built by a script from NIST's CSV and the SP 800-171A PDF. A <code>catalog --check</code> command and the tests pin the counts and the total weight of 313.</li>
+<li><strong>Exact scoring.</strong> The SPRS score from 110 down to &minus;203, partial credit for 3.5.3 (MFA) and 3.13.11 (FIPS), a provisional label while anything is unanswered or the SSP is missing, and the conditional Level 2 threshold of 88.</li>
+<li><strong>The 32 CFR 170.21 POA&amp;M rules.</strong> Only 1-point gaps may go on a POA&amp;M, six requirements never may, and 3.13.11 may at &minus;3. Eligible gaps become draft items due 180 days after the assessment; the rest are listed with the reason.</li>
+<li><strong>Read-only collectors.</strong> A Windows script with 18 checks (<code>secedit /export</code>, <code>auditpol /get</code>, <code>Get-*</code> cmdlets, CIM queries, registry reads) and a Microsoft 365 / Entra ID script with 6 checks that makes only Microsoft Graph <code>GET</code> requests with four read-only scopes. They change nothing and handle no credentials, and each check records the exact command it ran.</li>
+<li><strong>Evidence beside the answer.</strong> 37 rules inform 37 of the 320 objectives. When a collector finding disagrees with the assessor, the objective is flagged "Conflicts with evidence" and both values are shown; the assessor's answer is what the score uses.</li>
+<li><strong>Documents.</strong> The SSP and the POA&amp;M as Word documents, the POA&amp;M as CSV (spreadsheet formulas neutralized) and the SPRS summary as Markdown. Every export opens with the disclaimer.</li>
+<li><strong>Hardening.</strong> PBKDF2-SHA256 password hashes, an httpOnly SameSite=Strict JWT cookie, per-IP login lockout, a fail-closed API, a read-only guest mode where every write returns 403, parameterized SQL with allow-listed filters, size and encoding checks on uploads, and a strict Content-Security-Policy.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>How it works</h2>
+<ol>
+<li><strong>Scope and parameters.</strong> The organization, CAGE codes, CUI boundary and assets go into the SSP. Organization-defined parameters such as minimum password length, lockout threshold and session lock time feed the collector rules, and changing one re-evaluates every stored finding.</li>
+<li><strong>Collect.</strong> The scripts write JSON that is uploaded and validated (size, UTF-8, line length, format version). A rules file evaluates each check with three-valued logic, so anything unreadable stays Not assessed instead of passing or failing. Where one host or tenant setting cannot prove an organization-wide objective, it is recorded as supporting evidence only.</li>
+<li><strong>Answer and score.</strong> The assessor marks each objective Met, Not met or N/A (with a justification). A requirement is Met only when every objective is Met or N/A. The score and status are always derived from the answers, never stored, and unanswered requirements count at full weight so an unfinished assessment never looks better than it is.</li>
+<li><strong>Plan, export and track.</strong> Gaps become POA&amp;M items with owners and milestones, the documents are generated on download, and the History page compares assessments over time.</li>
+</ol>
+<div class="table-wrap"><table>
+<thead><tr><th>Rule</th><th>Value</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>Weights</td><td>5 (44 requirements), 3 (14), 1 (51); 3.12.4 has no value</td><td>DoD Assessment Methodology &sect;5(d), Annex A</td></tr>
+<tr><td>Score range</td><td>110 down to &minus;203</td><td>Derived from weights totalling 313</td></tr>
+<tr><td>Conditional Level 2 status</td><td>Score &divide; 110 &ge; 0.8, so at least 88</td><td>32 CFR 170.21</td></tr>
+<tr><td>POA&amp;M closeout</td><td>Within 180 days</td><td>32 CFR 170.21</td></tr>
+</tbody>
+</table></div>
+<figure class="case-figure">
+<img src="../images/cases/cmmc-ready-requirement-detail.webp" alt="CMMC Ready requirement page for AC.L2-3.1.10 session lock: the assessor answered Met, the Windows collector found a 3600-second timeout on host FS-01, and both values are shown in a Conflicts with evidence panel with the observed and expected settings" width="1200" height="1174" loading="lazy">
+<figcaption>A conflict on 3.1.10: the assessor says Met, one file server's collector output says Not met, and both are shown. The assessor's answer still decides the score.</figcaption>
+</figure>
+            </section>
+            <section class="case-section">
+<h2>Evidence</h2>
+<p>The demo loads a fictional contractor with two assessments: a provisional score of 41 in June 2026, then 86 in the autumn, two points short of conditional status, with 3.5.3 and 3.8.8 blocking it because neither may go on a POA&amp;M.</p>
+<p>401 tests (369 backend with pytest, 32 frontend with node:test) cover the catalog against the published counts and weights, every scoring rule including the six requirements barred from a POA&amp;M, both collectors against compliant, non-compliant and unreadable synthetic output, conflicts, the exports and their disclaimer, every API endpoint, guest mode on every write route, SQL injection payloads on every parameter, upload validation and authentication. CI runs the tests, the catalog and coverage checks, the frontend tests and build, <code>pip-audit</code>, <code>npm audit</code> and a gitleaks scan, and runs the Windows collector for real on GitHub's <code>windows-latest</code> runner under both PowerShell 7 and Windows PowerShell 5.1, then parses its output.</p>
+<figure class="case-figure">
+<img src="../images/cases/cmmc-ready-overview.webp" alt="CMMC Ready overview for a fictional contractor: SPRS score 86 of 110 on a gauge from minus 203 to 110, two points short of the conditional status threshold of 88, the biggest gap IA.L2-3.5.3, five conflicts with evidence, a family heatmap of met and not met requirements, and the gaps that would raise the score most" width="1200" height="1556" loading="lazy">
+<figcaption>The overview: the SPRS score against the 88-point threshold, what blocks conditional status, the family heatmap and the gaps that move the score most.</figcaption>
+</figure>
+<figure class="case-figure">
+<img src="../images/cases/cmmc-ready-evidence-detail.webp" alt="CMMC Ready evidence page for Windows host ENG-WS-01: 19 met, 0 not met and 10 not assessed by collector, with checks such as fips_mode and firewall_profiles each showing the exact command it ran and the objectives it informs" width="1200" height="1200" loading="lazy">
+<figcaption>Evidence from one Windows host: each check shows the exact read-only command it ran and the objectives it informs.</figcaption>
+</figure>
+            </section>
+            <section class="case-section">
+<h2>What I'd do next</h2>
+<ul>
+<li><strong>A live tenant run.</strong> The Microsoft 365 collector follows the Graph v1.0 documentation and is tested against synthetic responses, but has not yet been run against a real tenant.</li>
+<li><strong>More collectors.</strong> Linux, Intune device compliance and Google Workspace, and several tenants and sites in one assessment.</li>
+<li><strong>Accountability.</strong> Per-user accounts with an answer history and an audit log of who changed what, plus encryption of the database at rest.</li>
+<li><strong>Localization.</strong> Audit-policy parsing understands English output only today; on other display languages it fails safe and leaves the objective Not assessed.</li>
+</ul>
+            </section>
+            <section class="case-section">
+<h2>Links</h2>
+<ul class="case-links">
+<!-- LIVE_DEMO: add https://cmmc-ready.vercel.app/ after deploy -->
+<li><a class="btn btn-small" href="https://github.com/AndrewPrice98/CMMC-Ready" target="_blank" rel="noopener">Code on GitHub</a></li>
+<li><a class="btn btn-small btn-ghost" href="https://github.com/AndrewPrice98/CMMC-Ready/blob/main/docs/COLLECTOR_COVERAGE.md" target="_blank" rel="noopener">Collector coverage</a></li>
+<li><a class="btn btn-small btn-ghost" href="https://github.com/AndrewPrice98/CMMC-Ready/blob/main/DECISIONS.md" target="_blank" rel="noopener">Design decisions</a></li>
+<li><a class="btn btn-small btn-ghost" href="../portfolio.html">Back to all projects</a></li>
+</ul>
+            </section>
+        </article>
+    </main>
+
+    <footer class="site-footer status-bar">
+        <div class="status-left">
+            <span class="status-branch">&#x2387; main</span>
+            <span class="status-ok">&#x2713; 0 errors</span>
+            <span>&copy; 2026 Andrew T. Price II</span>
+        </div>
+        <div class="status-right">
+            <span class="status-extra">UTF-8</span>
+            <span class="status-extra">HTML</span>
+            <a href="https://github.com/AndrewPrice98" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+
+</body>
+</html>

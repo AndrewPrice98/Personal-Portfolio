@@ -512,7 +512,7 @@ a:focus-visible, .btn:focus-visible {
 .net-map .device.proj .box { stroke: var(--green); }
 .net-map .device.cred .box { stroke: var(--yellow); }
 .net-map .device text { fill: var(--text); }
-.net-map .device .tip { fill: var(--muted); opacity: 0; }
+.net-map .device .tip { fill: var(--muted); opacity: 0; pointer-events: none; }
 .net-map .device:hover .tip, .net-map .device:focus .tip, .net-map .device:focus-visible .tip { opacity: 1; }
 .net-map .device:hover .box { fill: var(--surface-2); }
 .net-map .device:focus-visible { outline: none; }
@@ -543,6 +543,7 @@ a:focus-visible, .btn:focus-visible {
 .queue-filters button:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
 .alert-queue { list-style: none; margin: 0 0 1rem; padding: 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
 .alert-row[hidden] { display: none; }
+.queue-more-wrap { margin: 0; }
 .alert-row + .alert-row { border-top: 1px solid var(--border); }
 .alert-row a {
     display: grid;

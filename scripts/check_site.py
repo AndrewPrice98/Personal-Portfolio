@@ -214,7 +214,7 @@ def check_titles(site):
             if not (t := text_walk(html).title.strip()).endswith(TITLE_SUFFIX)]
 
 
-CASE_SLUGS = ["netguard", "minisiem", "logingestllm", "ccna-study", "cysa-study",
+CASE_SLUGS = ["netguard", "minisiem", "cmmc-ready", "logingestllm", "ccna-study", "cysa-study",
               "job-tracker", "flight-tracker", "tempered", "sudo-snake"]
 CASE_SECTIONS = ["Summary", "Problem", "What I built", "How it works",
                  "Evidence", "What I'd do next", "Links"]
@@ -271,7 +271,8 @@ def check_case_files(site):
     return problems
 
 
-SEVERITY = {"netguard": "CRIT", "minisiem": "CRIT", "logingestllm": "HIGH", "ccna-study": "HIGH",
+SEVERITY = {"netguard": "CRIT", "minisiem": "CRIT", "cmmc-ready": "HIGH",
+            "logingestllm": "HIGH", "ccna-study": "HIGH",
             "cysa-study": "HIGH", "job-tracker": "MED", "flight-tracker": "MED",
             "tempered": "MED", "sudo-snake": "MED"}
 
@@ -432,6 +433,9 @@ def check_mission(site):
     return problems
 
 
+MAP_MAX_DEVICES = 16
+
+
 class MapWalker(HTMLParser):
     """Collects hrefs of <a> inside #map's <svg> and .net-map-list."""
 
@@ -494,14 +498,15 @@ def check_map(site):
         problems.append(f"index.html: #map has {w.unlabelled} svg link(s) without a non-empty aria-label")
     if len(w.svg_hrefs) != len(w.list_hrefs):
         problems.append(f"index.html: #map has {len(w.svg_hrefs)} svg links but {len(w.list_hrefs)} list links")
-    if len(w.list_hrefs) > 12:
-        problems.append(f"index.html: #map has {len(w.list_hrefs)} devices, at most 12")
+    if len(w.list_hrefs) > MAP_MAX_DEVICES:
+        problems.append(f"index.html: #map has {len(w.list_hrefs)} devices, at most {MAP_MAX_DEVICES}")
     if not w.list_hrefs:
         problems.append("index.html: #map has no devices")
     return problems
 
 
 QUEUE_FEATURED = {"NetGuard": "projects/netguard.html", "MiniSIEM": "projects/minisiem.html",
+                  "CMMC Ready": "projects/cmmc-ready.html",
                   "LogIngestLLM": "projects/logingestllm.html",
                   "CySA+ Study": "projects/cysa-study.html", "CCNA Study": "projects/ccna-study.html",
                   "Job Tracker": "projects/job-tracker.html",
@@ -512,6 +517,11 @@ QUEUE_COURSEWORK = {"Card Scanner": "https://github.com/AndrewPrice98/Card-Scann
                     "Tic Tac Toe": "https://github.com/AndrewPrice98/React100-TicTacToe",
                     "San Diego Top Spots": "https://github.com/AndrewPrice98/SanDiegoTopSpots",
                     "Mortgage Calculator": "https://github.com/AndrewPrice98/React100MortgageCalc"}
+# The home page shows only the top featured rows, so a recruiter can scan it;
+# portfolio.html lists every project.
+QUEUE_HOME = ["NetGuard", "MiniSIEM", "CMMC Ready", "LogIngestLLM", "CySA+ Study",
+              "CCNA Study", "Job Tracker", "Military Flight Tracker"]
+QUEUE_HOME_MAX = 8
 QUEUE_SEVERITIES = {"crit", "high", "med", "info"}
 
 
@@ -573,7 +583,12 @@ def check_queue(site):
                 problems.append(f"{name}: queue row '{r['title']}' has no link")
         if len(titles) != len(w.rows):
             problems.append(f"{name}: queue has duplicate row titles")
-        want = set(QUEUE_FEATURED) | (set(QUEUE_COURSEWORK) if name == "portfolio.html" else set())
+        if name == "index.html":
+            want = set(QUEUE_HOME)
+            if [r["title"] for r in w.rows] != QUEUE_HOME:
+                problems.append(f"{name}: queue rows are {[r['title'] for r in w.rows]}, expected {QUEUE_HOME} in that order")
+        else:
+            want = set(QUEUE_FEATURED) | set(QUEUE_COURSEWORK)
         if set(titles) != want:
             problems.append(f"{name}: queue rows differ: missing {sorted(want - set(titles))}, unexpected {sorted(set(titles) - want)}")
         for t, href in QUEUE_FEATURED.items():
@@ -600,12 +615,28 @@ def check_queue(site):
             problems.append(f"{name}: coursework rows need an '(opens GitHub in a new tab)' hint")
         if name == "index.html" and 'class="queue-filters"' not in site.pages[name]:
             problems.append("index.html: no .queue-filters")
+        if name == "index.html" and not any(tag == "a" and "queue-more" in (a.get("class") or "").split()
+                                            and a.get("href") == "portfolio.html" for tag, a in walk(html).tags):
+            problems.append("index.html: no a.queue-more link to portfolio.html after the queue")
+    if len(QUEUE_HOME) > QUEUE_HOME_MAX or not set(QUEUE_HOME) <= set(QUEUE_FEATURED):
+        problems.append(f"check_site.py: QUEUE_HOME must be at most {QUEUE_HOME_MAX} titles from QUEUE_FEATURED")
     return problems
+
+
+def check_terminal_projects(site):
+    js_path = site.root / "js" / "terminal.js"
+    js = js_path.read_text(encoding="utf-8") if js_path.exists() else ""
+    m = re.search(r"var PROJECTS = \[(.*?)\n\s*\];", js, re.S)
+    slugs = re.findall(r"\['([a-z0-9-]+)',", m.group(1)) if m else []
+    if sorted(slugs) != sorted(CASE_SLUGS):
+        return [f"js/terminal.js: PROJECTS slugs {slugs} differ from CASE_SLUGS {CASE_SLUGS}"]
+    return []
 
 
 CHECKS = [check_balanced, check_links, check_no_empty_links,
           check_nav, check_fast_lane, check_titles, check_case_files,
-          check_severity, check_terminal_fallback, check_window_classes, check_mission, check_map, check_queue]
+          check_severity, check_terminal_fallback, check_window_classes, check_mission, check_map, check_queue,
+          check_terminal_projects]
 
 
 def main(argv):
