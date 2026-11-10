@@ -89,10 +89,10 @@
             </section>
             <section class="case-section">
 <h2>Evidence</h2>
-<p>All seven injected scenarios are detected. Time to detect is measured at snapshot granularity (about 5 to 6 seconds in the recordings), and 0 s means detected on the first injected report.</p>
+<p>All seven injected scenarios are detected. Time to detect is measured at snapshot granularity (about 5 to 6 seconds in the recording the scenarios are injected into, about 10 seconds in the daytime recordings and in live mode), and 0 s means detected on the first injected report.</p>
 <p>One scenario is expected not to fire. In <code>gradual_drift</code> a real track is dragged 0.1 NM per poll, which stays inside every kinematic limit, so single-receiver plausibility checks cannot see it. It is kept as a documented gap: validation reports "gap holds", and if a future change makes it fire, validation fails until the scenario is promoted.</p>
 <p>The false-positive budget counts only findings of severity medium or high, and is the larger of 1.0 per hour and 1.5 times the measured rate. Across five recordings the counted rate is 0 per hour, so the budget sits at its 1.0 per hour floor. The two daytime recordings do produce low-severity GT-010 findings, which are listed and not budgeted.</p>
-<p>530 backend tests and 41 frontend tests pass, and CI runs the validation, the recordings manifest check, <code>pip-audit</code>, <code>npm audit</code> and gitleaks.</p>
+<p>558 backend tests and 41 frontend tests pass, and CI runs the validation, the recordings manifest check, <code>pip-audit</code>, <code>npm audit</code> and gitleaks.</p>
 <figure class="case-figure">
 <img src="../images/cases/ghosttrack-alert-detail.webp" alt="GhostTrack alert detail for a position jump: the observed 1,592 kt implied speed against the 960 kt threshold, the possible benign causes, an evidence pack download, and the track drawn on a map of the Los Angeles area, marked as injected test data" width="1200" height="1348" loading="lazy">
 <figcaption>An alert: what failed, observed against threshold, the benign causes to rule out first, and an evidence pack to export. This one is injected test data.</figcaption>
