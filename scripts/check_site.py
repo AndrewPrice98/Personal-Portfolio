@@ -91,7 +91,95 @@ def check_no_empty_links(site):
             for tag, attrs in walk(html).tags if attrs.get("href") == ""]
 
 
-CHECKS = [check_balanced, check_links, check_no_empty_links]
+NAV_TEXTS = ["Home", "Projects", "Resume", "Contact"]
+TITLE_SUFFIX = "| Andrew T. Price II"
+
+
+class TextWalker(HTMLParser):
+    """Collects the link texts inside <nav>, the <title>, and the text and
+    link classes inside the first element with class fast-lane."""
+
+    def __init__(self):
+        super().__init__()
+        self.nav_depth = 0
+        self.nav_links, self._link = [], None
+        self.in_title, self.title = False, ""
+        self.fl_depth, self.fl_text, self.fl_classes = 0, "", []
+        self.fl_seen = False
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        classes = (a.get("class") or "").split()
+        if tag == "nav":
+            self.nav_depth += 1
+        if tag == "a" and self.nav_depth:
+            self._link = ""
+        if tag == "title":
+            self.in_title = True
+        if self.fl_depth and tag not in VOID:
+            self.fl_depth += 1
+        elif "fast-lane" in classes and not self.fl_seen:
+            self.fl_seen, self.fl_depth = True, 1
+        if self.fl_depth:
+            self.fl_classes += classes
+
+    def handle_endtag(self, tag):
+        if tag == "nav":
+            self.nav_depth -= 1
+        if tag == "a" and self._link is not None:
+            self.nav_links.append(" ".join(self._link.split()))
+            self._link = None
+        if tag == "title":
+            self.in_title = False
+        if self.fl_depth and tag not in VOID:
+            self.fl_depth -= 1
+
+    def handle_data(self, data):
+        if self._link is not None:
+            self._link += data
+        if self.in_title:
+            self.title += data
+        if self.fl_depth:
+            self.fl_text += data
+
+
+def text_walk(html):
+    w = TextWalker()
+    w.feed(html)
+    w.close()
+    return w
+
+
+def check_nav(site):
+    return [f"{name}: nav links are {w.nav_links}, expected {NAV_TEXTS}"
+            for name, html in site.pages.items()
+            if (w := text_walk(html)).nav_links != NAV_TEXTS]
+
+
+def check_fast_lane(site):
+    problems = []
+    for name, html in site.pages.items():
+        w = text_walk(html)
+        if not w.fl_seen:
+            problems.append(f"{name}: no .fast-lane element")
+            continue
+        for needle in ("Secret", "Security+", "open to work"):
+            if needle not in w.fl_text:
+                problems.append(f"{name}: fast lane is missing '{needle}'")
+        for cls in ("fl-resume", "fl-linkedin"):
+            if cls not in w.fl_classes:
+                problems.append(f"{name}: fast lane is missing a .{cls} link")
+    return problems
+
+
+def check_titles(site):
+    return [f"{name}: title '{t}' does not end with '{TITLE_SUFFIX}'"
+            for name, html in site.pages.items()
+            if not (t := text_walk(html).title.strip()).endswith(TITLE_SUFFIX)]
+
+
+CHECKS = [check_balanced, check_links, check_no_empty_links,
+          check_nav, check_fast_lane, check_titles]
 
 
 def main(argv):
